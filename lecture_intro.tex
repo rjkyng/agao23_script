@@ -28,10 +28,10 @@ We will dive right into graph problems by considering how electrical
 current moves through a network of resistors.
 
 First, let us recall some middle school physics.
-If some of these things don't make sense two you, don't worry, in less
-than paragraph from here, we'll be make to safely doing math.
+If some of these things don't make sense to you, don't worry, in less
+than a paragraph from here, we'll be back to safely doing math.
 
-Recall that a typical battery that buy from Migros has two
+Recall that a typical battery that one buys from Migros has two
 endpoints, and produces what is called a \emph{voltage
   difference} between these endpoints.
 
@@ -51,7 +51,7 @@ this imbalance of charge.
 \end{figure}
 
 We can also imagine a kind of battery that tries to send a certain
-amount of current the wires between its endpoints, e.g. 1 unit of charge per
+amount of current through the wires between its endpoints, e.g. 1 unit of charge per
 unit of time.
 This will be a little more convenient to work with, so let us focus on
 that case.
@@ -92,14 +92,14 @@ We have one unit of charge flowing out of $s$ per unit of time, and
 one unit coming into $t$.
 Because charge is conserved, the current flowing into any other point
 $u$ must equal the amount flowing out of it.
-This is called Kirchoff's Current Law.
+This is called Kirchhoff's Current Law.
 
 To send one unit of current from $s$ to $t$, we must be sending it
-first form $s$ to $u$ and then from $u$ to $t$.
+first from $s$ to $u$ and then from $u$ to $t$.
 So the current on edge $(s,u)$ is 1 and the current on $(u,t)$ is 1.
 By Ohm's Law, the voltage difference must also be 1 across each of the two
 wires.
-Thus if the voltage is $x$ at $s$, it must be $x+1$ at $u$ and $x+2$
+Thus, if the voltage is $x$ at $s$, it must be $x+1$ at $u$ and $x+2$
 at $t$. What is $x$? It turns out it doesn't matter: We only care
 about the differences. So let us set $x = 0$.
 
@@ -123,7 +123,7 @@ Let us try one more example:
 How much flow will go directly from $s$ to $t$ and how much via $u$?
 
 Well, we know what the net current flowing into and out of each vertex
-must be, and we can use to set up some equations.
+must be, and we can use that to set up some equations.
 Let us say the voltage at $s$ is $x_s$, at $u$ is $x_u$ and at $t$ is $x_t$.
 \begin{tight_itemize}
 \item Net current at $s$:   $-1 = (x_s-x_t) + (x_s-x_u)$
@@ -141,7 +141,7 @@ Do we know enough to calculate the electrical flow in some other
 network of resistors?
 To answer this, let us think about the network
 as a graph.
-Consider a undirected graph $G = (V,E)$ with $\abs{V} = n$ vertices and
+Consider an undirected graph $G = (V,E)$ with $\abs{V} = n$ vertices and
 $\abs{E} = m$ edges, and let us assume $G$ is connected.
 Let's associate a resistance
 $\rr(e) > 0$ with every edge $e \in E$.
@@ -166,7 +166,7 @@ We can assign a voltage to every vertex $\xx \in R^V$.
 Ohm's Law says that the electrical flow induced by these voltages will
 be $\ff(u,v) = \frac{1}{\rr(u,v)} (\xx(v) - \xx(u))$.
 
-Say we want to route unit of current from vertex $s \in V$ to vertex
+Say we want to route one unit of current from vertex $s \in V$ to vertex
 $t \in V$.
 As before, we can write an equation for every vertex saying that the
 voltage differences must produce the desired net current:
@@ -218,7 +218,7 @@ The voltages $\xx$ that induce $\ff$ must solve this system of linear
 equations, and we can use that to compute both $\xx$ and $\ff$.
 It is exactly the same linear
 equation as the one we considered earlier.
-We can show a that for a connected graph, a solution $\xx$
+We can show that for a connected graph, a solution $\xx$
 exists if and only if the
 flow into the graph equals the net flow out, which we can express as
 $\sum_{v} \dd(v) = 0$ or $\vecone^\trp \dd = 0$.
@@ -251,7 +251,7 @@ would call them ``power''.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\linewidth]{fig/lecture1_flow-vs-energy.png}
-  \captionof{figure}{Energy has a function of flow in a resistor with
+  \captionof{figure}{Energy as a function of flow in a resistor with
     resistance $r = 1$.}
   \label{fig:flow-vs-energy}
 \end{figure}
@@ -303,7 +303,7 @@ function\footnote{Consider the function in one variable $c(x) =
 
 It is also interesting to know whether \emph{all} solutions to $\LL
 \xx = \dd$ are in fact minimizers of $c$. The answer is
-yes, and will see some very general tools for proving statements like
+yes, and we will see some very general tools for proving statements like
 this in Chapter~\ref{sec:cvopt}.
 % Although, we have not yet proven the electrical flow minimizes
 % electrical energy $\sum_e \rr(e) \ff(e)^2$, I have promised you that
@@ -325,7 +325,7 @@ network of resistors leads to a \emph{pair} of optimization problems,
 let's call them $\ff^*$ and $\xx^*$,
 and that the solutions to the two problems are related, in our case
 through the equation $\ff^* = \RR^{-1}\BB^{\trp} \xx^*$ (Ohm's Law).
-But, why and how are these two optimization problems related?
+But why and how are these two optimization problems related?
 
 Instead of minimizing $c(\xx)$, we can equivalently think about maximizing
 $-c(\xx)$, which gives the following optimization problem: $\max_{\xx \in \R^V} -c(\xx)$.
@@ -351,7 +351,7 @@ vector $\dd$, how quickly can we compute $\xx$?
 Broadly speaking, there are two very different families of algorithms
 we could use to try to solve this problem.
 
-Either, we could solve the linear equation using something like
+We could solve the linear equation using something like
 \emph{Gaussian Elimination} to compute an exact solution.
 
 Alternatively,
@@ -425,7 +425,7 @@ line segment between these points.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\linewidth]{fig/lecture1_flow-vs-energy-convex.png}
-  \captionof{figure}{Energy has a function of flow in a resistor with
+  \captionof{figure}{Energy as a function of flow in a resistor with
     resistance $r = 1$. The function is convex.}
   \label{fig:flow-vs-energy-convex}
 \end{figure}
@@ -453,7 +453,7 @@ aren't convex.
 
 
 Convex functions and convex sets are central to optimization,
-because for most problems of minimization a convex function over a
+because for most problems of minimization of a convex function over a
 convex set, we can develop fast algorithms \footnote{
  There are some convex optimization problems that are NP-hard.
   That said, polynomial time algorithms exist for almost any convex
@@ -551,7 +551,7 @@ For this problem, we do not yet know how to improve over classical
 combinatorial algorithms using convex optimization.
 
 \paragraph{Multi-commodity flow.}
-We can make the even harder still, by simultaneously trying to route
+We can make the problem even harder still, by simultaneously trying to route
 two types of flow (imagine pipes with Coke and Pepsi).
 Our problem now looks like
 \begin{align*}
