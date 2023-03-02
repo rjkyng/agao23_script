@@ -18,7 +18,7 @@ A common algorithmic problem that arises is the problem of partitioning the vert
 
 In this lecture, we make precise what "well-connected" means by introducing the notions of \emph{conductance} and \emph{expanders}. 
 
-Building on the last two lectures, we show that the second eigenvalue of the Laplacian $L$ associated with graph $G$ can be used to certify that a graph is "well-connected" (more precisely the second eigenvalue of a normalized version of the Laplacian). This result, called Cheeger's inequality, is one of the key tools in Spectral Graph Theory. Moreover, it can be turned into an algorithm that computes the partition efficiently!
+Building on the chapter, we show that the second eigenvalue of the Laplacian $L$ associated with graph $G$ can be used to certify that a graph is "well-connected" (more precisely the second eigenvalue of a normalized version of the Laplacian). This result, called Cheeger's inequality, is one of the key tools in Spectral Graph Theory. Moreover, it can be turned into an algorithm that computes the partition efficiently!
 
 \section{Conductance and Expanders}
 
@@ -51,7 +51,7 @@ However, this proof gives then rise to an algorithm $\textsc{CertifyOrCut}(G, \p
     \item \emph{Certifies} that $G$ is a $\phi$-expander, or
     \item Presents a \emph{cut} $S$ such that $\phi(S) \leq \sqrt{2\phi}$.
 \end{itemize}
-In the graded homework, we ask you to make the procedure $\textsc{CertifyOrCut}(G, \phi)$ explicit, and then to show how to use it to compute a $\phi$-expander decomposition. 
+Careful but rather straight-forward recursive application of this procedure then yields an algorithm to compute a $\phi$-expander decomposition. 
 
 \section{A Lower Bound for Conductance via Eigenvalues}
 
