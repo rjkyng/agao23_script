@@ -45,7 +45,7 @@ Therefore, $W \vecone_u$ is the distribution over the vertices that the random w
 
 \section{Convergence Results for Random Walks}
 
-In this first part of the chapter, we are interested mostly in convergence of random walks that is the two questions:
+In this first part of the chapter, we are interested mostly in convergence of random walks. We want to answer the following two questions:
 \begin{itemize}
 	\item How does a random walk behave after a large number of steps are taken? 
 	\item How many steps does it take asymptotically until the random walk behaves as if an infinite number of steps were taken?
@@ -137,7 +137,7 @@ where we use in the last equality that $\nu_1 = 0$. Using this simple characteri
 \[
     \lim_{t \to \infty} \pp_t = \alpha_1 \DD^{1/2} \ppsi_1 = \ppi.
 \]
-where we used in the equality that $\DD^{1/2} \ppsi_1 = \frac{\dd }{(\vecone^{\trp} \dd)^{1/2}}$ and the value of $\alpha_1$ (from \ref{eq:definitionOfAlphaForWalks}).
+where we use that $\alpha_1 = \ppsi_1^{\trp} D^{-1/2} \pp_0 = \frac{\vecone^{\trp} \pp_0 }{(\dd^{\trp} \vecone)^{1/2}}= \frac{1}{(\dd^{\trp} \vecone)^{1/2}}$ by the definition of $\alpha_1$ (from \ref{eq:definitionOfAlphaForWalks}), by plugging in the value of $\ppsi_1$ and by recalling that $\pp_0$ is a distribution and therefore $\vecone^{\trp} \pp_0 =1$; and using that $\DD^{1/2} \ppsi_1 = \frac{\dd }{(\vecone^{\trp} \dd)^{1/2}}$.
 
 \begin{theorem}
 For any connected graph $G$, we have that the lazy random walk converges to the stationary distribution of $G$.
