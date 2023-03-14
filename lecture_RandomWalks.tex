@@ -172,20 +172,26 @@ From Equation \ref{eq:distributionRandomWalkTSteps}, we obtain that
 Taking the absolute value on both sides, we obtain that
 \begin{align*}\small
 |\pp_t(b) - \ppi(b)|
-&\leq \left(1-\frac{\nu_2}{2}\right)^t\sum_{i=2}^n \left|\alpha_i  \vecone_b^\trp\DD^{1/2} \ppsi_i \right|\leq \left(1-\frac{\nu_2}{2}\right)^t \sqrt{\left( \sum_{i=2}^n \alpha_i^2 \right) \left( \sum_{i=2}^n \left(\vecone_b^\trp\DD^{1/2} \ppsi_i \right)^2 \right)}
+&\leq \left(1-\frac{\nu_2}{2}\right)^t\sum_{i=2}^n \left|\alpha_i  \vecone_b^\trp\DD^{1/2} \ppsi_i \right|\leq \left(1-\frac{\nu_2}{2}\right)^t \sqrt{\left( \sum_{i=2}^n \alpha_i^2 \right) \left( \sum_{i=2}^n \beta_i^2 \right)}
 \end{align*}
-where we use Cauchy-Schwarz in the last inequality, i.e. $|\langle \uu, \vv \rangle|^2 \leq \langle \uu, \uu \rangle \cdot \langle \vv, \vv \rangle$. Let us finally bound the two sums:
+where we use Cauchy-Schwarz in the last inequality, i.e. $|\langle \uu, \vv \rangle|^2 \leq \langle \uu, \uu \rangle \cdot \langle \vv, \vv \rangle$ and define $\beta_i = \vecone_b^\trp\DD^{1/2} \ppsi_i$ for each $i$. Let us finally bound the two sums:
 \begin{itemize}
-    \item By \ref{eq:definitionOfAlphaForWalks}, $\sum_{i=2}^n \alpha_i^2 = \sum_{i=2}^n \left(\ppsi^\trp_i \DD^{-1/2}\pp_0 \right)^2 \leq \|\DD^{-1/2}\pp_0\|_2^2 =  \|\DD^{-1/2}\vecone_a\|_2^2 = 1/\dd_a$.
-    \item Finally, we show that $\sum_{i=2}^n \left(\vecone_b^\trp\DD^{1/2} \ppsi_i \right)^2 \leq \sum_{i=1}^n \left(\vecone_b^\trp\DD^{1/2} \ppsi_i \right)^2 = \|\DD^{1/2}\vecone_b\|_2^2 = \dd_b$ (we only show the first equality, the other inequalities are straight-forward). We first expand the vector $\DD^{1/2}\vecone_b$ along the eigenvectors using some values $\beta_i$ defined
+    \item We show that $\sum_{i=2}^n \alpha_i^2 \leq \|\DD^{-1/2}\vecone_a\|_2^2 = 1/\dd_a$. The last equality is trivial,  therefore we only prove the inequality. To see this, observe that by  \ref{eq:definitionOfAlphaForWalks}, we have
+    \[
+     \|\DD^{-1/2}\vecone_a\|_2^2 = (\DD^{-1/2} \vecone_a)^{\trp} (\DD^{-1/2} \vecone_a) = \left(\sum_{i = 1}^n \alpha_i \ppsi_i^{\trp}\right) \cdot \left(\sum_{i = 1}^n \alpha_i \ppsi_i \right).
+    \]
+    But since the vectors $\ppsi_i$ form an orthonormal basis, we must further have 
+    \[
+    		\left(\sum_{i = 1}^n \alpha_i \ppsi_i^{\trp}\right) \cdot \left(\sum_{i = 1}^n \alpha_i \ppsi_i \right) = \sum_{i = 1}^n \alpha_i^2 \leq \sum_{i = 2}^n \alpha_i^2. 
+    \]
+    \item Finally, we need to show that $\sum_{i=2}^n \beta_i^2 \leq \|\DD^{1/2}\vecone_b\|_2^2 = \dd_b$.  Here, we first observe that 
     \[
         \DD^{1/2}\vecone_b = \sum_{i=1}^n \beta_i \ppsi_i \iff  \ppsi_i^\trp \DD^{1/2}\vecone_b = \beta_i \iff  \vecone_b^\trp \DD^{1/2}\ppsi_i= \beta_i  
     \]
-    We used orthogonality to get the first equivalence, and then just take the transpose to get the second. We can now write
+    and then, we can again exploit that the vectors $\ppsi_i$ form an orthonormal basis and therefore 
     \[
-    \|\DD^{1/2}\vecone_b\|_2^2 = (\DD^{1/2}\vecone_b)^{\trp} (\DD^{1/2}\vecone_b) = \left(\sum_{i=1}^n \beta_i \ppsi_i^\trp\right) \left(\sum_{i=1}^n \beta_i \ppsi_i\right) = \sum_{i=2}^n \beta_i^2
+    \|\DD^{1/2}\vecone_b\|_2^2 = (\DD^{1/2}\vecone_b)^{\trp} (\DD^{1/2}\vecone_b) = \left(\sum_{i=1}^n \beta_i \ppsi_i^\trp\right) \left(\sum_{i=1}^n \beta_i \ppsi_i\right) \leq \sum_{i=2}^n \beta_i^2.
     \]
-    where we again used orthogonality of $\ppsi_i$. The equality then follows by definition of $\beta_i$.
 \end{itemize}
 
 Putting everything together (and using $1+x \leq e^x, \forall x \in \mathbb{R}$), we obtain 
