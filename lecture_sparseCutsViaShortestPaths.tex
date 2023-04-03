@@ -1,0 +1,308 @@
+\chapter{Sparse Cuts via Shortest Paths}
+
+\renewcommand{\vol}{\textit{vol}}
+\newcommand{\APSP}{\alpha_{APSP}}
+
+In this chapter, we learn about a new algorithm to compute expanders that reduces the problem to a sequence of shortest paths finding problems.
+
+\section{Introduction}
+
+We start with a review of expanders where make a subtle change the notion of an expander in comparison to chapter \ref{chap:cheegersInequality} to ease the exposition.
+
+\paragraph{Definitions.} We let $G=(V,E)$ be an unweighted, connected graph in this chapter, and let $\dd$ be the degree vector, $E(S,V \setminus S)$ denote the set of edges crossing the cut $A,B$
+
+Given set $\emptyset \subset S \subset V$, then we define the \textbf{sparsity} $\psi(S)$ of $S$ by
+\[
+\psi(S) = \frac{|E(S, V \setminus S)|}{ \min\{|S|, |V \setminus S| \} } 
+\]
+Note that \textbf{sparsity} $\psi(S)$ differs from \textbf{conductance} $\phi(S) = \frac{|E(S, V \setminus S)|}{ \min\{\vol(S), \vol(V \setminus S) \} }$, as defined in \ref{chap:cheegersInequality}, in the denominator. It is straight-forward to see that in a connected graph $\psi(S) \geq \phi(S)$ for all $S$. 
+
+Clearly, we again have $\psi(S) = \psi(V \setminus S)$. We define the \emph{sparsity} of a graph $G$ by $\psi(G) = \min_{\emptyset \subset S \subset V} \psi(S)$. For any $\psi \in (0, n]$, we say a graph $G$ is a $\psi$-expander with regard to sparsity, if $\psi(G) \geq \psi$. When the context is clear, we simply say that $G$ is a $\psi$-expander. 
+
+
+\paragraph{Decremental All-Pairs Shortest-Paths (APSP).} 
+A decremental $\APSP$-approximate All-Pairs Shortest-Paths (APSP) data structure (abbreviated $\APSP$-APSP) is a data structure that is initialized to an $m$-edge $n$-vertex graph $G$ and supports the following operations:
+\begin{itemize}
+    \item $\textsc{IncreaseEdgeWeight}(u,v, \Delta)$: increases the edge weight of $(u,v)$ by $\Delta$. 
+    \item $\textsc{QueryDistance}(u,v)$: for any $u,v \in V$ returns a distance estimate $\tilde{d}(u,v)$ that $\APSP$-approximates the distance from $u$ to $v$ in the current graph $G$ denoted $d_G(u,v)$, i.e. $\tilde{d}(u,v) \in [d_G(u,v), \APSP \cdot d_G(u,v)]$.
+    \item $\textsc{QueryPath}(u,v)$: returns a path $\pi$ from $u$ to $v$ in the current graph $G$ of total weight $\tilde{d}(u,v)$ (that is the value of the distance estimate if queried).
+\end{itemize}
+We denote the total time required by the data structure to execute a series of $q$ queries and $u$ update operations on an $n$-vertex constant-degree graph by $T_{APSP}(q,u)$.
+
+Here we use the $\APSP$-APSP data structure to abstract the query model. A simple implementation of a $1$-APSP data structure is to just store each update to the graph, and then run Dijkstra's algorithm for each query. For this implemenation, we obtain $T(q,u) = \tilde{O}(q \cdot m + u)$. 
+
+Recently, deterministic $n^{o(1)}$-approximate APSP data structures have been developed (see \cite{chuzhoy2021decremental,bernstein2022deterministic}) that process any sequence of $\tilde{O}(m)$ edge weight increases in total time $m^{1+o(1)}$ while answering distance queries in time $n^{o(1)}$ time and for a path query, returns paths in time near-linear in the number of edges on the path (i.e. if it returns a path $P$, it takes at most time $|P|n^{o(1)}$. It is conjectured that in the near-future, $O(\log n)$-APSP data structures are found that implement edge weight increases in time $\tilde{O}(u + m)$ and answer distance queries in time $\tilde{O}(1)$ and path queries in time $\tilde{O}(|P|)$. 
+
+\section{The Main Result}
+
+The main result of this chapter is the following theorem. We emphasize that by standard reductions, one can translate between sparsity and conductance and remove the bounded-degree assumption, both with only a constant loss in quality. 
+
+\begin{restatable}{theorem}{APSPreduction}\label{thm:fineGrainedReduction}
+\label{theorem:balanceCut}
+Given a graph $G$ of degree at most 10, an $\APSP$-approx decremental APSP algorithm and sparsity parameter $\psi$, there is an algorithm $\textsc{SparseCutOrCertify}(G, \psi)$ that either
+\begin{enumerate}
+    \item\label{case:balanceCut} Finds a cut $(S, \overline{S})$ of sparsity $\leq \psi$, or
+    \item\label{case:noBalanceCut}
+     Certifies that every cut $(X, \overline{X})$ has sparsity
+  $\Omega\left(\frac{\psi}{\APSP \log^3 m}\right).$
+\end{enumerate}
+The algorithm is randomized, works with high probability, requires the APSP data structure to undergo $\tilde{O}( \APSP \cdot m/ \psi )$ updates, queries it $\tilde{O}(m)$ times and spends an additional $\tilde{O}( \APSP \cdot m/ \psi)$ time.
+\end{restatable}
+\begin{remark}
+Our algorithm requires the APSP data structure to work against an adaptive adversary, i.e. the generated update sequence relies on the information obtained from queries to the data structure. Data structures that are deterministic directly work in this adversary model.
+\end{remark}
+\begin{remark}
+APSP data structures often answer queries in time proportional to the number of edges on the approximate shortest path that they return. Our algorithm ensures that the number of such edges on all paths is bounded by $O( \APSP \cdot m \phi^{-1} \log^4 m)$.
+\end{remark}
+
+As a corollary, we thus obtain that using Dijkstra's algorithm, we obtain a $O(\log^3 m)$-approximate, $\tilde{O}(m^2)$ time algorithm to find the sparsest cut in a graph. 
+
+Using one of the advanced data structures from \cite{chuzhoy2021decremental,bernstein2022deterministic}, we obtain a $n^{o(1)}$-approximate, $m^{1+o(1)}$ time algorithm to find the sparsest cut.
+
+\section{The Main Idea: Embedding Expanders into Graphs}
+
+At first, you might think that it sounds impossible to certify that \emph{all} cuts have large sparsity. But the notion of embedding graphs into each other makes such statements possible and even intuitive.
+
+\paragraph{Embedding Graphs (Into Each Other).} Given graphs $H$ and $G$ that are defined over the same vertex set, then we say that a function $\textsc{Embed}_{H \xrightarrow{} G}$ is an \emph{embedding} if it maps each edge $(u,v) \in H$ to a $u$-to-$v$ path $P_{u,v} = \textsc{Embed}_{H \xrightarrow{} G}(u,v)$ in $G$. 
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[scale=0.2]{./fig/embedGraph_lectureCutMatching.jpeg}
+    \caption{In this example the red edge $(u,v)$ in $H$ is mapped to the red $u$-to-$v$ path in $G$.}
+    \label{fig:my_label}
+\end{figure}
+
+We say that the \emph{congestion} of $\textsc{Embed}_{H \xrightarrow{} G}$ is the maximum number of times that any edge $e \in E(G)$ appears on any embedding path: \[
+\congestion(\textsc{Embed}_{H \xrightarrow{} G}) = \max_{e \in E(G)} |\{ e' \in E(H) \;|\; e \in \textsc{Embed}_{H \xrightarrow{} G}(e') \}|.
+\]
+
+\paragraph{Certifying Expander Graphs via Embeddings.} Let us next prove the following lemma that is often consider Folklore.
+
+\begin{lemma}\label{lma:folklore_embedding}
+Given a $\phi$-expander graph $H$ and an embedding of $H$ into $G$ with congestion $C$, then $G$ must be an $\Omega\left(\frac{\phi}{C}\right)$-expander. 
+\end{lemma}
+\begin{proof}
+Consider any cut $(S, V \setminus S)$ with $|S| \leq |V \setminus S|$. Since $H$ is a $\psi$-expander, we have that $|E_H(S, V \setminus S)| \geq \phi|S|$. We also know by the embedding of $H$ into $G$, that for each edge $(u,v) \in E_H(S, V \setminus S)$, we can find path a $P_{u,v}$ in $G$ that also has to cross the cut $(S, V \setminus S)$ at least once. But since each edge in $G$ is on at most $C$ such paths, we can conclude that at least $|E_H(S, V \setminus S)|/ C \geq \phi |S|/C$ edges in $G$ cross the cut $(S, V \setminus S)$. 
+\end{proof}
+
+\paragraph{Finding a Sparse $\Omega(\log n)$-Expander.} We have learnt that if we already know a good expander, then we can use it to certify other expanders. We already know a graph that is an excellent expander and that we could use: the complete graph $K_n$. However, $K_n$ is rather unwieldy and any embedding mapping $K_n$ into another graph is of size $\Omega(n^2)$ while we would like to develop fast algorithms. We would much prefer an expander that is sparse. This turns out to be rather simple: we can simply down-sample the complete graph. 
+
+\begin{lemma}\label{lma:sampleDownCompleteGraph}
+Given any positive integer $n$, obtaining $H$ by sampling each edge in the complete graph $K_n$ with probability $10 \log(n)/n$ yields that $H$ is a $\Omega(\log n)$-expander (with respect to sparsity) and has maximum degree at most $d_H = O(\log m)$. The algorithm succeeds with high probability.
+\end{lemma}
+
+\section{The Algorithm}
+
+First, we present the algorithm for the first phase that either embeds a large portion of an expander or finds a large set of far-apart vertex-pairs w.r.t. some edge weights $\bw$.
+
+Then, in the subsequent section, we show that we can either use the embedding from the procedure above, or find a separator using $\bw$ that we can show to be a sparse cut. 
+
+\subsection{An Algorithm to Separate Or Certify}
+\label{sec:seporcert}
+
+We start by proving the following lemma where we plan to set $C = \Theta(d_H \log n/\psi)$. 
+
+\begin{lemma}
+\label{lemma:SeparateOrCertifyBalanced}
+Given an $\APSP$-APSP data structure, a graphs $G$ with maximum degree $10$, and congestion parameter $C \in [1, n]$. Then,  algorithm $\textsc{SeparateOrCertify}(G, C)$ (Algorithm \ref{alg:embedOrSep}) first samples a graph $H$ with maximum degree $d_H = O(\log n)$ via \Cref{lma:sampleDownCompleteGraph} and then outputs either
+\begin{enumerate}
+    \item A set of weights $\bwInt \in \mathbb{R}_{\geq 1}^{E(G)}$ with $\|\bwInt\|_1 \leq 20n d_H$,  and a subset of edges $F \subseteq E(H)$ such that 
+    for all edges $(u,v) \in F$, we have $\dist_{\bwInt}(u,v) > {C n d_H}/{|F|},$ or
+    \item An embedding $\Pi_{H \mapsto G}$ that maps each edge $(u,v)$ in $H$ to a $uv$-path in $G$ with congestion $O(C \cdot \APSP \cdot \log^2(n))$.
+\end{enumerate}
+The algorithm requires the APSP data structure to undergo $\tilde{O}(C \APSP m)$ edge updates and $\tilde{O}(m)$ distance queries along with additional $\tilde{O}(C \APSP m)$ time.
+\end{lemma}
+
+\begin{algorithm}
+\DontPrintSemicolon
+Sample $H$ via \Cref{lma:sampleDownCompleteGraph}.\\
+$\Pi_{H \mapsto G} \gets \emptyset$; $\bw \gets \mathbf{1}^{|E(G)|}$; $\eta \gets  \frac{1}{ 4 C \APSP \log_2(n)}$ with maximum degree $d_H = O(\log n)$.\label{lne:init}\\
+% \lc{check initializing $i=0$}
+Maintain an $\APSP$-approximate APSP data structure on $G$ weighted by $\bw$.\\
+\For(\label{lne:forLoop}){$i = 0, 1, \ldots, \lfloor \log_2(n) \rfloor$}{
+    \ForEach(\label{lne:foreachUnrouted}){$e \in E(H)$ with $\Pi_{H \mapsto G}(e) = \emptyset$}{
+        \If(\label{lne:ifReallyEmbed}){$\textsc{APSP}.\textsc{QueryDist}(u,v) \leq 2^{i} \cdot C \APSP$}{
+            $\Pi_{H \mapsto G}(e) \gets \textsc{APSP}.\textsc{QueryPath}(u,v)$. \\
+            \ForEach{$f \in \Pi_{H \mapsto G}(e)$}{
+             $\textsc{APSP}.\textsc{IncreaseWeight}(e, \eta \bw_e)$;\label{lne:increaseWeights}
+             $\bw_e \gets (1+\eta) \bw_e$.
+            }
+        }
+    }
+   $F \gets  \{ e \in  E(H) \;|\; \Pi_{H \mapsto G}(e) = \emptyset\}$.\\
+    \lIf{$|F| > n d_H / 2^i$}{
+        \Return $(\bw, F)$. \label{lne:terminateCase2} \label{lne:bPrimeDefn}
+    }
+}
+\Return $(H, \Pi_{H \mapsto G})$. \label{lne:terminateEmbed}
+\caption{$\textsc{SeparateOrCertify}(G, C)$}\label{alg:embedOrSep}
+\end{algorithm}
+
+\paragraph{The Algorithm.} \Cref{alg:embedOrSep} implements $\textsc{SeparateOrCertify}(G, C)$. The goal of the algorithm is to find an embedding of $H$ into $G$ with congestion $\Cong(\Pi_{H \mapsto G}) \leq C$.  This would prove that $G$ is a $\tilde{\Omega}(\psi)$-expander.
+
+To achieve this goal, we use a technique which is an instance of the \emph{Multiplicative Weight Update (MWU)} framework. Initially, we define a uniform weight function $\bw$ with weights over $G$. We try to embed each edge $(u,v) \in E(H)$ using a short $uv$-path $P_{uv}$ in $G$ with respect to $\bw$. Whenever we embed an edge $(u,v)$ in such a way and the path $P_{uv}$ contains an edge $e \in E(G)$, we increase the weight $\bw_e$ by a multiplicative factor $(1+\eta)$. Naturally, after $t$ edges have been embedded by using the edge $e$, we have scaled up the weight of $e$ by a factor of $(1+\eta)^t$. Using $e^x \le (1 + 2x), x \in [0, 1]$, and setting $\eta \approx 1/C$ ensures that the weight $\bw_e$ approaches a large polynomial in $n$ as $t$ approaching $2\eta \log n$ (which again is $\approx 1/C$). 
+
+At the same time, the algorithm only embeds edges $(u,v) \in E(H)$ if the distance between the endpoints in $G$ w.r.t. $\bw$ is small. This ensures that $\|\bw\|_1 = O(n \log(1/n))$ and that we never use an edge $e$ into which many embedding paths are already routed. 
+
+More precisely, we proceed in rounds to embed edges in $H$. At later rounds (i.e. when $i$ large), we have already embed a large number of edges in $H$. Since the number of remaining edges is small, we allow for them to be embed with slightly longer paths which still lets us argue that $\|\bw\|_1$ is increased by at most $\tilde{O}(n)$ in the current round. If in any round, it is not possible to embed many of the remaining edges with paths of weight at most the current threshold, we can simply return these edges and end up in the first scenario.
+
+
+\paragraph{Correctness (Returning with $(H, \Pi_{H \mapsto G})$).} It is straight-forward to see from \Cref{alg:embedOrSep} that $\Pi_{H \mapsto G}$ is a valid embedding from $H$ to $G$. It thus only remains to bound the congestion of $\Pi_{H \mapsto G}$.
+
+\begin{lemma}\label{lma:congestion}
+The congestion of $\Pi_{H \mapsto G}$ is at most $\frac{2\log(2 C \APSP n)}{\eta} = O(\log(n)/\eta)$.
+\end{lemma}
+\begin{proof}
+Let us fix any edge $e \in E(G)$. Note that each time we add an embedding path in the outer foreach-loop that contains $e$, we increase the weight $\bw_e$ to $(1+\eta)\bw_e$. Since initially, $\bw_e = 1$, we have that after $t$ times that the edge $e$ was used to embed an edge in the outer foreach-loop, we have that $\bw_e = (1+\eta)^t \geq e^{t\eta/2}$ since $e^x \leq 1+2x$ for $x \in [0,1]$. In particular, if the algorithm embeds $t$ times into $e$ for $t > \frac{2\log(2 C \APSP n)}{\eta}$, then at the end of the algorithm, we would have $\bw_e > 2 C \APSP n$.
+
+However, note that by the if-condition in the outer foreach-loop, we never embed into an edge $e$ that has weight more than $2^{\lfloor \log_2(n) \rfloor} \cdot C \APSP \leq n \cdot C \APSP $ since otherwise the path using this edge has higher weight. We can thus conclude that at the end of the algorithm, $\bw_e \leq (1+\eta)C \APSP n \leq 2C \APSP n$, which leads to a contradiction. 
+\end{proof}
+
+\paragraph{Correctness (Returning with $(\bw, F)$).} We start by proving the following claim.
+
+\begin{invariant}\label{inv:totalWeight}
+After the $i$-th iteration of the for-loop in \Cref{lne:forLoop}, we have $\|\bw\|_1 \leq 10n (1 + 2n d_H \cdot \eta C\APSP \cdot (i+1)) \leq 20n d_H$.
+\end{invariant}
+\begin{proof}
+Initially, $\|\bw\|_1 = \|\mathbf{1}^{|E(G)|}\|_1 \leq 10n$.
+
+To gauge the increase in $\|\bw\|_1$ during the $i$-th iteration of the for-loop, consider the effect of embedding a new edge $e$ in the outer foreach-loop (we only consider such iterations if the if-statement evaluates true as otherwise $\bw$ does not change). 
+Letting $\bw^{OLD}$ denote $\bw$ just before the foreach-loop iteration and $\bw^{NEW}$ right after.
+We clearly have that $\|\bw^{NEW}\|_1 = \|\bw^{OLD}\| + \eta \cdot \bw^{OLD}(\Pi_{H' \mapsto G}(e))$.
+But since the if-statement was true, we have that $\bw^{OLD}(\Pi_{H' \mapsto G}(e)) \leq 2^i \cdot C\APSP$.
+We conclude that each edge that is newly embed increases $\|\bw\|_1$ by at most $\eta \cdot 2^i \cdot C\APSP$.
+
+We next prove that at the beginning of the $i$-th iteration of the for-loop, there are at most $n d_H/2^{i-1}$ edges in the set $\{ e \in  E(H) \;|\; \Pi_{H \mapsto G}(e) = \emptyset\}$.
+At the very first iteration $i = 0$, $|E(H)| \le 2n d_H$ by definition of $d_H$ being the max degree of $H$. Consider now the beginning of the $i$-th iteration for $i > 0$. Clearly, the set of edges not embed, is then exactly the set $F$ that was computed during the $(i-1)$-th iteration (since otherwise the algorithm would have terminated). But this implies that the set is of size at most $n d_H / 2^{i-1}$. 
+
+Thus, we can bound the total increase of $\|\bw\|_1$ during the $i$-th iteration by 
+\[\frac{n d_H}{2^{i-1}} \cdot \eta \cdot 2^i \cdot C\APSP = 2n d_H \cdot \eta C\APSP.\]
+
+The total number of iterations is $\lfloor \log_2(n) \rfloor + 1.$ This establish the second inequality using the definition of $\eta$.
+\end{proof}
+
+Note that for every edge $(u,v)$ that is in $F$ when the algorithm returns, the foreach-loop iterated over $(u,v)$ and found that $\textsc{APSP}.\textsc{QueryDist}(u,v) > 2^i \cdot C\APSP$ (as otherwise $(u,v)$ would have been embedded in the preceding iteration) and therefore $\dist_{\bw}(u,v) > 2^i \cdot C$. Using that $|F| > n d_H/2^i$ which implies $2^i > n d_H/ |F|$, we thus obtain for each $(u,v) \in F$ that $\dist_{\bw}(u,v) > C n d_H/ |F|$, as desired.
+
+\paragraph{Runtime Analysis.} The for-loop of the algorithm runs at most $O(\log (n))$ iterations and in the $i^{th}$ iteration at most $O(n d_H /2^i)$ edges are iterated over in the  outer foreach-loop. Thus, the total number of queries to the APSP data structure can be bounded by $O(\sum_i n d_H /2^i) = \tilde{O}(n)$. 
+
+The time the algorithm spends updating the weights can be bounded by observing that each edge $e$ has its weight increased only after an additional embedding path was added through $e$; but the congestion is bounded by $O(\log n/\eta)$ by \Cref{lma:congestion}, thus the foreach-loop is executed at most $O(n\log n/\eta)$ times over the entire course of the algorithm. This concludes our analysis of the number of updates to the APSP data structure. The runtime analysis of the algorithm follows along the same line of reasoning.
+
+\subsection{Extracting the Sparsest Cut}
+
+In order to prove \Cref{theorem:balanceCut}, we now have to show how to extract a sparsest cut from the weight function that is returned in case no embedding is found. We point out that in order to do so it is significantly more convenient to work with an integral weight function $\bw$. We therefore round the weight function that we obtain \Cref{lemma:SeparateOrCertifyBalanced} up which might result in $\|\bw\|_1$ being at most twice as large as stated.
+
+We use the following auxiliary algorithm that finds a cut with few edges crossing given any two vertices at large distance. 
+
+\begin{restatable}{claim}{sepLem}\label{clm:thinLayer}
+The procedure $\textsc{FindThinLayer}(G, \bwInt, u, v, D)$ takes graph $G$ weighted by $\bwInt \in \mathbb{N}_{\geq 1}^{E(G)}$ and two vertices $u,v$ such that $\dist_{\bwInt}(u,v) > D$ for some integer $D > 4 \log_2 \|\bwInt\|_1$. It returns a set of vertices $S \neq \emptyset$ such that $|S| \leq |V|/2$ and $|E_G(S, V \setminus S)| \leq \frac{4  \bwInt(E_G(S)) \log_2 \|\bwInt\|_1 }{D}$. The algorithm runs in time $O(|E_G(S)| \log |E_G(S)|)$.
+\end{restatable}
+
+Given this auxiliary algorithm, we can state the final algorithm and prove our main result, \Cref{theorem:balanceCut}. As described before, we use the algorithm $\textsc{SeparateOrCertify}(G, C)$. It is straight-forward to conclude that $G$ contains no balanced sparse cuts, if the procedure returns $H$ along with an embedding $\Pi_{H \mapsto G}$.
+
+Otherwise, we take the weight function and repeatedly find a separator between the endpoints of edges in $F$ that are far from each other (using the auxiliary algorithm). In the end, we produce a sparse cut where the smaller side has size $\Omega(|F|)$ (intuitively this makes sense, as endpoints of edges in $F$ are far, we should be able to separate most endpoints from one another).
+
+\begin{algorithm}
+$C \gets 16 d_H \log(n)/\psi$.\\
+\lIf{$\textsc{SeparateOrCertify}(G, C)$ returns $(H, \Pi_{H \mapsto G})$}{
+    \Return $(H, \Pi_{H \mapsto G})$.\label{lne:retTrivial}
+}\Else(\tcp*[h]{i.e. if it returns $(\bwInt, F)$}){
+    $\widehat{\bw} \gets \lceil \bwInt \rceil$. \\
+    $X \gets V(G)$.\\
+    $D \gets {C n d_H}/{|F|}$.\\
+    \While{$\exists (u,v) \in H[X] \cap F$ and $|V \setminus X| \le n / 4$}{
+         $S \gets \textsc{FindThinLayer}(G[X], \widehat{\bw}, u, v,  D)$.\\
+         $X \gets X \setminus S$.
+    }
+    \Return $(X, V \setminus X)$. \label{lne:returnSparseCut}
+}
+\caption{$\textsc{SparseCutOrCertify}(G, \psi, b)$}\label{alg:mainAlgo}
+\end{algorithm}
+
+\APSPreduction*
+
+\begin{proof}%[Proof of \Cref{theorem:balanceCut}.]
+The case where \Cref{alg:mainAlgo} returns immediately follows directly from \Cref{lemma:SeparateOrCertifyBalanced}, \Cref{lma:sampleDownCompleteGraph} and \Cref{lma:folklore_embedding}.
+Let us therefore analyze the remaining case where the algorithm continues with $(\bw, F)$.  First, we observe that the while-loop can be seen to terminate since each iteration shrinks the set $X$ by \Cref{clm:thinLayer} and $X = \emptyset$ trivially has no two vertices at far distance). 
+
+We next prove that the final set $V \setminus X$ has size $|F|/d_H \leq |V \setminus X| \leq \frac{3}{4}n$:
+\begin{itemize}
+    \item $|V \setminus X| \geq |F|/d_H$: For $X$, we have that if any edge in $F$ still has both of its endpoints contained in $G[X]$, then the while-loop would not have terminated. But this means that each of the edges in $F$ has at least one endpoint in $V \setminus X$. Since $H$ has maximum degree $d_H$, we have that $|V \setminus X| \geq |F|/d_H$. 
+    
+    \item $|V \setminus X| \leq \frac{3}{4}n$: Since the while-loop condition allows only invocations of $\textsc{FindThinLayer}$ if $|V \setminus X| \leq n/4$, and since this procedure returns the smaller side of the cut it produces by \Cref{clm:thinLayer} (which is found on $G[X]$), we can conclude that at the end of the algorithm $|V \setminus X| \leq n/4 + n/2 \leq \frac{3}{4}n$.
+\end{itemize}
+This implies that $|V \setminus X|, |X| \geq |F|/2d_H$.
+
+Next, we analyze the number of crossing edges in $(X, V \setminus X).$
+Let $S_1, S_2, \ldots, S_k$ be the sets returned by procedure $\textsc{FindThinLayer}$ one after another over the course of the while-loop, such that $V \setminus X = \cup S_i$. We first observe that these sets are vertex-disjoint since after the $i$-th iteration, the procedure $\textsc{FindThinLayer}$ is invoked on the graph $G_i = G[V \setminus (S_1 \cup \ldots \cup S_i)]$ to find $S_{i+1}$.
+Further, the final cut $(X, V \setminus X)$ contains only edges that were previously in a thin layer, i.e. \[
+E_G(X, V \setminus X) \subseteq \bigcup_i E_{G_i}(V \setminus (S_1 \cup \ldots \cup S_i), S_i).
+\]
+
+It remains to use the guarantee of \Cref{clm:thinLayer} that for each $S_i$, we have $|E_{G_i}(S_i, V \setminus (S_1 \cup \ldots \cup S_i))| \leq \frac{4  \widehat{\bw}(S_i) \log_2 \|\bwInt\|_1 }{D}$ and by the vertex-disjointness of $S_1, S_2, \ldots, S_k$, we thus have that
+\begin{align*}
+    |E_G(X, V \setminus X)| &\leq | \bigcup_i E_{G_i}(S_i, V \setminus (S_1 \cup \ldots \cup S_i))| \leq \sum_i \frac{4  \widehat{\bw}(S_i) \log \|\widehat{\bw}\|_1 }{D} \\
+    &\leq \frac{4  \|\widehat{\bw}\|_1 \log \|\widehat{\bw}\|_1 }{D} =
+    \frac{4 |F| \|\widehat{\bw}\|_1 \log \|\widehat{\bw}\|_1 }{C n d_H} < 8|F| \log(n)/C
+\end{align*}
+where we use $\|\bwInt\| \leq 20n d_H$ from \Cref{theorem:balanceCut}, that $n$ is reasonably large (such that $20 d_H < n$) and $\widehat{\bw}$ is obtained from rounding up $\bwInt$, and our choice of $D$. Since we have shown that $|X|, |V \setminus X| \geq |F|/2d_H$, choosing $C = 16 d_H \log(n)/\psi$ yields $\Psi(V \setminus X) = \Psi(X) \leq \psi$, as desired.
+
+We use the disjointness of $S_1, S_2, \ldots, S_k$ to argue that the total time spend in procedure $\textsc{FindThinLayer}$ can be bounded by $O(n \log n)$. The remainder of the runtime analysis is trivial given \Cref{lemma:SeparateOrCertifyBalanced}.
+\end{proof}
+
+\paragraph{Implementing $\textsc{FindThinLayer}(G, \bwInt, u, v, D)$.}
+It remains to provide an implementation of $\textsc{FindThinLayer}(G, \bwInt, u, v, D)$ and prove \Cref{clm:thinLayer}.
+The algorithm follows a simple ball-growing procedure.
+It grows balls from both endpoints $u$ and $v.$
+Because the distance between $u$ and $v$ are guaranteed to be large, the procedure takes longer time.
+However, these two balls cannot be larger than the entire graph.
+There must be a moment that one of the ball grows only by a thin layer.
+
+\sepLem*
+\begin{proof}
+Since $\dist_{\bwInt}(u,v) > D$ by assumption, we have that at least one of $u$ and $v$ have their ball to radius $D/2$ contain at most half the vertices in $G$. More formally, for some $z \in \{u,v\}$, $|B_{G, \bwInt}(z, D/2)| \leq |V|/2$. We claim that there is a radius $0 < r \leq D/2$, such that taking $S = B(z, r)$ satisfies the above guarantees. 
+For this proof, it is convenient to define the following auxiliary function $\Phi(z,r) = \sum_{e \in E} \Phi(z,r,e)$ where the latter functions are defined for all edges $e = (x,y) \in E$ by
+\[
+   \Phi(z, r, e) = 
+    \begin{cases} 
+         |\dist_{\bwInt}(z,x) - \dist_{\bwInt}(z,y)|  & \text{if } \dist_{\bwInt}(z,x)  \leq r \text{ and } \dist_{\bwInt}(z,y) \leq r\\
+        r - \dist_{\bwInt}(z,x) & \text{if } \dist_{\bwInt}(z,x) \leq r < \dist_{\bwInt}(z,y)\\
+        r - \dist_{\bwInt}(z,y) & \text{if } \dist_{\bwInt}(z,y) \leq r < \dist_{\bwInt}(z,x)\\
+        0 & \text{otherwise}
+    \end{cases}
+\]
+Here, an edge $e = (x,y) \in E(G)$ contributes the distance between its two endpoints $x$ and $y$ (which is at most $\bw_e$) to $\Phi(z,r,e)$ if both endpoints are fully contained in the ball $B(z,r)$. If neither of the endpoints are contained it contributes $0$. Otherwise, $e = (x,y)$ contributes the distance of the endpoint closer to $z$ to the boundary of the ball. In both cases, $0 \leq \Phi(z, r, e) \leq \bwInt_e$. This means in particular that the weight of edges incident to $B(z,r)$ denoted by $\bwInt(E(B(z,r)))$ is always greater-equal to $\Phi(z,r)$, i.e. $\bwInt(E(B(z,r))) \geq \Phi(z,r)$ for all $r$.
+
+Note further that $\Phi(z, r+1) - \Phi(z,r)$ is exactly $|E_G(B(z, r), V \setminus B(z, r))|$, the number of edges that leave $B(z,r)$. 
+To see this, observe that an edge $e = (x, y)$ contributes $1$ to the difference if $\dist_{\bwInt}(x, z) \le r < r+1 \le \dist_{\bwInt}(y, z)$ holds, i.e. $e$ leaves $B(z, r)$.
+Otherwise, the contribution of $e$ are identical in both $\Phi(z, r)$ and $\Phi(z, r+1).$
+Here we use that $\bwInt$ is integral and so are distances in $G$.
+
+
+Given this set-up, assume for contradiction that for all $0 < r < D/2$, we have 
+\[\Phi(z,r+1) > \left(1+ \frac{4 \log_2 \|\bwInt\|_1}{D}\right) \Phi(z,r).\] 
+By induction we have that 
+\[\Phi(z, D/2) \geq \left(1+ \frac{4 \log_2 \|\bwInt\|_1}{D}\right)^{D/2 - 1} \Phi(z,1)% \geq \left(1+ \frac{16 \log \|\bwInt\|_1}{D}\right)^{D/2 - 1} \geq \left(1+ \frac{8 \log \|\bwInt\|_1}{D} + (\frac{8 \log \|\bwInt\|_1}{D})^2\right)^{D/2 - 1} \geq e^{\frac{8 \log \|\bwInt\|_1}{D} * (D/4)} = e^{2 \log \|\bwInt\|_1} \geq \|\bwInt\|_1^2 
+>\|\bwInt\|_1\] where we use that $1+x \geq 2^x$ for $x \in [0,1]$.
+This would give a contradiction since $\|\bwInt\|_1 \ge \bwInt(E(B(z,D/2))) \geq \Phi(z,D/2) > \|\bwInt\|_1$.
+
+Therefore, there must be some radius $0 < r < D/2$ such that
+\begin{align*}
+% \label{eq:sparseCutCert}
+\Phi(z,r+1) \le \left(1+ \frac{4 \log_2 \|\bwInt\|_1}{D}\right) \Phi(z,r).
+\end{align*}
+Combining with our previous discussion yields that
+\begin{align*}
+|E(B(z,r), V \setminus B(z,r))|
+&= \Phi(z, r+1) - \Phi(z, r) \\
+&\le \frac{4 \log_2 \|\bwInt\|_1}{D}\Phi(z,r) \\
+&\le \frac{4 \bwInt(E(B(z,r))) \log_2 \|\bwInt\|_1}{D}.
+\end{align*}
+We can therefore take $S = B(z,r)$, as desired.
+
+Finally, to compute this cut, we run Dijkstra's algorithm from $u$ and $v$ in parallel and check for the earliest radius $r$ for either of them such that the inequality holds. Thus, the algorithm runs in time $O(|E_G(S)| \log |E_G(S)|)$.
+\end{proof}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% TeX-engine: luatex
+%%% End:

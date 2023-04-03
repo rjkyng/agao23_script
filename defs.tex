@@ -13,11 +13,8 @@
 % \let\amsboldsymbol\boldsymbol % if you want to see the bad
 % boldsymbol for comparison
 \usepackage{bm} % fixes boldsymbol
-
 \usepackage{nicefrac}
-
 \usepackage{float}
-
 
 % switched to algorithm2e in lecture 9
 % \usepackage{algorithm} %ctan.org\pkg\algorithms
@@ -30,6 +27,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{observation}[theorem]{Observation}
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{invariant}[theorem]{Invariant}
 \newtheorem{claim}[theorem]{Claim}
 \newtheorem{fact}[theorem]{Fact}
 \newtheorem{assumption}[theorem]{Assumption}
@@ -283,6 +281,12 @@
 \newcommand\xxstar{{\boldsymbol{\mathit{x}}^{*}}}
 \newcommand\yystar{{\boldsymbol{\mathit{y}}^{*}}}
 
+\let\ggreater\gg
+\newcommand\bwInt{\boldsymbol{{\mathit{w}}}}
+\newcommand\bw{\boldsymbol{\mathit{w}}}
+\DeclareMathOperator{\Cong}{\mathtt{cong}}
+\DeclareMathOperator{\dist}{\mathtt{dist}}
+
 
 \newcommand\ffbar{\overline{\boldsymbol{\mathit{f}}}}
 
@@ -301,7 +305,6 @@
 \newcommand{\richard}[1]{{\bf \color{green} Richard: #1}}
 \newcommand{\rasmus}[1]{{\bf \color{olive} Rasmus: #1}}
 \newcommand{\ahad}[1]{{\bf \color{olive} Ahad: #1}}
-
 
 \newcommand{\expct}[2]{{}\mathop{\mathbb{E}}_{#1}\left[#2\right]}
 \newcommand{\E}[1]{\mathop{{}\mathbb{E}}\left[#1\right]}

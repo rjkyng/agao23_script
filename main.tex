@@ -6,8 +6,6 @@
 
 \newcommand\gap{\text{gap}}
 
-\usepackage{cleveref}
-
 \newcommand{\Zhao}[1]{{\color{red} Zhao: #1}}
 \newcommand{\Hongjie}[1]{{\color{red} Hongjie: #1}}
 \newcommand\symset{S}
@@ -27,16 +25,22 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{thm-restate}
 \usepackage{graphicx}
 %\usepackage{float}
+
 \usepackage[ruled,vlined]{algorithm2e}
 \SetKwBlock{Repeat}{repeat}{}
 %%% for this lecture
 % \newtheorem{theorem}{Definition}
 \interfootnotelinepenalty=10000
 
+\usepackage{cleveref}
+
 \usepackage{tikz}
 \usetikzlibrary{arrows}
+
+\usepackage{comment}
 
 %%% for this lecture
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
@@ -121,7 +125,6 @@ There will, however, be some changes to the content compared to last year.
 
 
 % \part{Introduction}
-
 \label{part:intro}
 \input{lecture_intro}
 
@@ -143,8 +146,9 @@ There will, however, be some changes to the content compared to last year.
 \input{lecture_randMatAndSparsification}
 \input{lecture_solvingLaplacians}
 
-%\part{Combinatorial Graph Algorithms}
-%\label{part:combinatorial}
+\part{Combinatorial Graph Algorithms}
+\label{part:combinatorial}
+\input{lecture_sparseCutsViaShortestPaths}
 %\input{lecture_maxFlow1}
 %\input{lecture_maxFlow2}
 %\input{lecture_DynamicTrees}
