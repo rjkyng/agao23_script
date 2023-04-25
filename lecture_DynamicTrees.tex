@@ -41,11 +41,12 @@ If you are not familiar with balanced binary search trees, we encourage you to r
 That said, we will quickly recap the important properties of binary search trees and treaps.
 If you're already familiar with treaps, you can skip ahead to the next section to see how we use them for building Link-Cut trees.
 %
-A binary search tree $\mathcal{T}$ is a data structure for keeping track of a set of \emph{items} where each item has a \emph{key} associated with it.
+
+\paragraph{Binary Search Trees.} A binary search tree $\mathcal{T}$ is a data structure for keeping track of a set of \emph{items} where each item has a \emph{key} associated with it.
 The data structure stores the items in a rooted binary tree with a node for each item, and maintains the property for each node $v$, all items in the \emph{left} subtree of $v$ have keys less than $v$, and all items in the \emph{right} subtree of $v$ have keys greater than $v$.
 This is called the \emph{search property} of the tree, because it makes it simple to search through the tree to determine if it contains an item with a given key.
 
-The binary trees we studied in APC supported the following operations, while maintaining the search property:
+The binary search trees we studied in APC supported the following operations, while maintaining the search property:
 \begin{description}
 \item[insert:] We can add an item to the tree with a specified key.
 \item[delete:] We can remove an item from the tree with a specified key.
@@ -54,10 +55,9 @@ The binary trees we studied in APC supported the following operations, while mai
 \item[join:] Given two binary search trees, one with keys in the interval $(-\infty,k]$, the other with keys in the interval $(k,\infty)$, form a single binary search tree containing the items of both.
 \end{description}
 
-\emph{Treaps} allow us to implement all of these operations, each with expected time $O(\log n)$ for each operation when working over $n$ items. 
+\paragraph{Search-Property-Preserving Tree rotations.} In this chapter, we will use that enforcing the search property in a binary tree still leaves various options to have a tree. In fact, there is a classic tree operation that preserves the search property while changing the tree: Tree rotations. 
 
-
-\paragraph{Tree rotations.} A crucial operation when implementing binary search trees in general and treaps in particular is \emph{tree rotation}. A tree rotation makes a local change to the tree by changing only a constant number of pointers around, while preserving the search property.
+A tree rotation makes a local change to the tree by changing only a constant number of pointers around, while preserving the search property.
 Given two items $v_1$ and $v_2$ such that $v_1$ is a child of $v_2$, a tree rotation applied to these two nodes will make $v_2$ the child of $v_1$, while moving their subtrees around to preserve the search property. This is shown in Figure~\ref{fig:binaryTreeRotation}.
 When the rotation makes $v_2$ the right child of $v_1$ (because $v_2$ has the larger key), this is called a \emph{right rotation}, and when it makes $v_2$ the left child of $v_1$ (because $v_2$ has a smaller key), it is called a \emph{left rotation}.
 
@@ -68,7 +68,7 @@ When the rotation makes $v_2$ the right child of $v_1$ (because $v_2$ has the la
     \label{fig:binaryTreeRotation}
   \end{figure}
 
-
+\paragraph{Balanced BSTs.} To implement the operations given above efficiently,  one needs to ensure that the BST always stays of bounded depth (normally $O(\log n)$). This is typically ensured by making tree rotations. In the rest of the chapter, we use a randomized strategy that ensures that the depth of the tree is $O(\log n)$ in expectation. The obtained data structure is often referred to as \emph{treap}.  We will not give the details here, but instead explicitly construct one in the next section and give a full (although brief) analysis.
 
 \section{A Data Structure for Path Graphs}
 
@@ -106,7 +106,7 @@ Then, for each path $P$ in $G$, we store the vertices in $P$ in a binary tree, i
 \]
 It is straight-forward to see that the operation $\textsc{PFindRoot}(v)$ can thus be implemented to run in expected $O(\log n)$ time by just iteratively following the parent pointers starting in $v$.
 
-\paragraph{Implementing $\textsc{PFindRoot}(v)$.} From any vertex $v$, we can simply follow the parent pointers in $\mathcal{T}_{P}$ until we are at the tree-root of $\mathcal{T}_{P}$. Then, we find the right-most child of $\mathcal{T}_{P}$ by following the $right_{\mathcal{T}_{P}}$ pointers. Finally, we return the right-most child which is the path-root.
+\paragraph{Implementing $\textsc{PFindRoot}(v)$.} From any vertex $v$, we can simply follow the parent pointers in $\mathcal{T}_{P}$ until we are at the tree-root of $\mathcal{T}_{P}$. Then, we find the right-most child of $\mathcal{T}_{P}$ by following the $right_{\mathcal{T}_{P}}$ pointers. Finally, we return the right-most child which is the path-root. Since the paths from $v$ is at depth $O(\log n)$ in expectation, and so is the path-root of $v$, we have that this operation can be executed in $O(\log n)$ expected time.
 
 \paragraph{Extra fields to help with $\textsc{PAddCost}(v, \Delta)$ and $\textsc{PFindMin}(v)$.} The key trick to do the Link-Cut tree operations efficiently is to store the change to subtrees instead of updating $cost(v)$ for each affected vertex. 
 
@@ -123,12 +123,12 @@ Then, we maintain for each $v$
     mincost(v) & parent_{\mathcal{T}_{P}}(v) = NULL, \\
     mincost(v) - mincost(parent_{\mathcal{T}_{P}}(v)) & otherwise\end{cases}
 \]
-With a bit of work, we can see that with these definitions, we obtain $mincost(v) = \sum_{w \in \mathcal{T}_{P}[v]} \Delta min(v)$ where $\mathcal{T}_{P}[v]$ is the $v$-to-tree-root path in $\mathcal{T}_{P}$. We can then recover $cost(v) = mincost(v) + \Delta cost(v)$. We say that $\Delta min(v)$ and $\Delta cost(v)$ are \emph{field-preserving} if we can compute $mincost(v)$ and $cost(v)$ in the above way.
+With a bit of work, we can see that with these definitions, we obtain $mincost(v) = \sum_{w \in \mathcal{T}_{P}[v]} \Delta min(v)$ where $\mathcal{T}_{P}[v]$ is the $v$-to-tree-root path in $\mathcal{T}_{P}$. We can then recover $cost(v) = mincost(v) + \Delta cost(v)$. We say that henceforth, that an operation/manipulation to the tree is \emph{field-preserving} if the fields  $\Delta min(v)$ and $\Delta cost(v)$ satisfy the equations above.
 
 \paragraph{Implementing $\textsc{PAddCost}(v, \Delta)$ and $\textsc{PFindMin}(v)$ -- the easy way.}
-First, we will discuss ways to implement $\textsc{PAddCost}$ and $\textsc{PFindMin}$ in ways that rely on the fact that $\textsc{PLink}$ and $\textsc{PCut}$ can preserve that $\Delta cost(v)$ and $\Delta mincost(v)$ still satisfy the relations we described above.
+First, we will discuss ways to implement $\textsc{PAddCost}$ and $\textsc{PFindMin}$ in ways that rely on the fact that $\textsc{PLink}$ and $\textsc{PCut}$ are field-preserving.
 
-Now, $\textsc{PAddCost}(v, \Delta)$ is very easy: First, consider the case when $v$ as no precessor on the path. If this is the case, we can simply find the tree-root of the tree $\mathcal{T}_{P}$ containing $v$ and at this root increase the value of the field $mincost$ by $\Delta$. This implicitly increases the cost of all nodes in the tree by $\Delta$.
+$\textsc{PAddCost}(v, \Delta)$ is very easy: First, consider the case when $v$ as no precessor on the path. If this is the case, we can simply find the tree-root of the tree $\mathcal{T}_{P}$ containing $v$ and at this root increase the value of the field $mincost$ by $\Delta$. This implicitly increases the cost of all nodes in the tree by $\Delta$.
 Second, consider the case when $v$ has a precessor $u$ in the path (we can store these explicitly, or we can search for it in the tree). Call $\textsc{PCut}(u,v)$ -- now $v$ no longer has a precessor and we can proceed as before. Finally, call $\textsc{PLink}(u,v)$. That's it.
 
 Implemeting  $\textsc{PFindMin}(v)$ is also very easy: First, consider the case when $v$ as no precessor on the path.  Again, we can find the tree-root $r$ of the tree $\mathcal{T}_{P}$ containing $v$.
@@ -182,12 +182,17 @@ While after the first for-loop the values can be computed efficiently, we might 
     \label{fig:PCutRotation}
 \end{figure}
 
-To ensure that the fields are correctly adjusted, we can make the $\Delta min(\cdot)$ values of the two vertices that are rotated equal to zero while ensuring that the tree is still \emph{field-preserving} by changing the $\Delta min(\cdot)$ fields of the (at most 3) subtree-roots of the subtrees to be rotated, and adapting the $\Delta cost(\cdot)$ fields of the two vertices to be rotated. Then, after the rotation, it is not hard to see that the tree is still \emph{field-preserving} and that the procedure applied in the second for-loop of the operation $\textsc{PAddCost}(v, \Delta)$ can then just be applied to the two rotated vertices and the subtree-roots of their subtrees. This ensures that the fields are maintained correctly. All of these operations can be implemented in $O(1)$ time per tree rotation.
-Note that  $\textsc{PCut}$ is basically just the treap split operation.
-In the exercises for this week, we ask you to come up with the pseudo-code for maintaing that the tree is \emph{field-preserving} during tree rotations.
+In the exercises for this week, we ask you to come up with the pseudo-code for \emph{field-preserving} tree rotations that still executes each rotation in $O(1)$ time.  Given this routine, we can then show that the implementation of  $\textsc{PCut}(u,v)$ is field-preserving overall. And since the number of rotations is bound by $O(\max\{depth(u), depth(v)\})$ and thus the time to execute the entire procedure is $O(\log n)$ in expectation.
 
-\paragraph{Implementing $\textsc{PLink}(u,v)$.} Implementing $\textsc{PLink}(u,v)$ could be done by reversing the process described above. We choose however a slightly different strategy: we insert a vertex $d_{\infty}$ with $\prio(d_{\infty}) = n^{100}$ and make it a right child of $u$. We then find the tree-root $r$ of the tree over the path containing $v$ (as a tail). Finally, we make $r$ a right child of $d_{\infty}$. It remains to use tree rotations to make $d_{\infty}$ a leaf in the tree.  Once this is accomplished, one can simply remove $d_{\infty}$ from the tree entirely (which can be seen as un-splitting two edges into $(u,v)$).
-Note that  $\textsc{PLink}$ is essentially the treap join operation.
+%To ensure that the fields are correctly adjusted, we can make the $\Delta min(\cdot)$ values of the two vertices that are rotated equal to zero while ensuring that the tree is still \emph{field-preserving} by changing the $\Delta min(\cdot)$ fields of the (at most 3) subtree-roots of the subtrees to be rotated, and adapting the $\Delta cost(\cdot)$ fields of the two vertices to be rotated. Then, after the rotation, it is not hard to see that the tree is still \emph{field-preserving} and that the procedure applied in the second for-loop of the operation $\textsc{PAddCost}(v, \Delta)$ can then just be applied to the two rotated vertices and the subtree-roots of their subtrees. This ensures that the fields are maintained correctly. All of these operations can be implemented in $O(1)$ time per tree rotation.
+%Note that  $\textsc{PCut}$ is basically just the treap split operation.
+
+
+\paragraph{Implementing $\textsc{PLink}(u,v)$.} Implementing $\textsc{PLink}(u,v)$ could be done by reversing the process described above: we use a dummy vertex $d_0$ with priority $0$, and add it as the right child of $u$. We use tree rotations to then obtain heap-order again. Now,  we can make $v$ the right child of $d_0$. Note that the resulting tree has the search and the heap-order properties. 
+
+It remains to get rid of $d_0$. To achieve this, we change its priority to $\infty$ (or say $n^{100}$), and then use tree rotations to obtain heap-order again. Since $d_0$ is the only vertex that violates the heap-order, this step results in $d_0$ being rotated downwards until it is a leaf. Then we can remove $d_0$ entirely. 
+
+Again, it is not hard to see that the implementation runs in $O(\log n)$ expected time.
 
 \paragraph{Notes.} The operations $\textsc{PLink}/ \textsc{PCut}$ can be implemented using almost all Balanced Binary Search Trees (especially the ones you have seen in your first courses on data structures). Thus, it is not hard to get a $O(\log n)$ worst-case time bound for all operations discussed above.
 
@@ -241,7 +246,7 @@ We no longer need to think about the balanced binary trees that are used interna
 \end{algorithm}
 \begin{algorithm}[H]
   \SetAlgoLined
-  $\textsc{Expose}(u)$; $parent_G(u) \gets NULL$; $\textsc{PCut}(u,v)$\;
+  $\textsc{Expose}(u)$; $\textsc{PCut}(u,v)$\;
    \lIf{$v$ has other incoming edge $(z,v)$}{$\textsc{PLink}(z,v)$}
   \caption{\textsc{Cut}(u,v)}
 \end{algorithm}
