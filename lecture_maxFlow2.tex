@@ -137,8 +137,8 @@ inherits all the behaviors/bounds we proved in the last chapter.
   L)$.
 
   In our $s$-$t$ path in $L'$, the vertex $v_j$ is reached by an edge from $v_{j-1}$,
-  and the level of $v_{j-1}$ in $G_{\ff}$ and $G_{\ff'}$
-  are the same, so the edge $(v_{j-1},v_j) \in L$ skips
+  and the level of $v_{j-1}$ in $G_{\ff}$ is at most the level it receives in $G_{\ff'}$
+  so the edge $(v_{j-1},v_j) \in L$ skips
   at least one level forward  in $G_{\ff}$.
   But, edges in $L$ do not skip a level in
   $G_{\ff}$, and edges in
@@ -228,7 +228,7 @@ For graphs with unit capacities ($c = 1$) we can prove even better bounds on the
     have $\abs{D_i} < 2n/k$ and so there must be two adjacent levels $j$, $j+1$
     for which this upper bound on the size holds.
     There can be at most
-    $|D_j|\cdot|D_{j+1}| \leq 4n^2/k^2$ edges between these levels, and by the min-cost
+    $|D_j|\cdot|D_{j+1}| \leq 4n^2/k^2$ edges between these levels, and by the min-cut
     max-flow theorem we saw in the previous chapter, this is an upper bound on the flow
     in $G_{\ff}$, and hence on the number of iterations still needed for our algorithm to
     terminate.
@@ -368,6 +368,8 @@ program:
   \end{aligned}
   \label{prog3}
 \end{align}
+
+This last linear program is the dual program to the maximum flow linear program.
 
 \begin{lemma}
   Programs \eqref{prog0}, \eqref{prog2}, and \eqref{prog3} have equal optimal values.
