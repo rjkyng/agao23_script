@@ -123,7 +123,7 @@ Then, we maintain for each $v$
     mincost(v) & parent_{\mathcal{T}_{P}}(v) = NULL, \\
     mincost(v) - mincost(parent_{\mathcal{T}_{P}}(v)) & otherwise\end{cases}
 \]
-With a bit of work, we can see that with these definitions, we obtain $mincost(v) = \sum_{w \in \mathcal{T}_{P}[v]} \Delta min(v)$ where $\mathcal{T}_{P}[v]$ is the $v$-to-tree-root path in $\mathcal{T}_{P}$. We can then recover $cost(v) = mincost(v) + \Delta cost(v)$. We say that henceforth, that an operation/manipulation to the tree is \emph{field-preserving} if the fields  $\Delta min(v)$ and $\Delta cost(v)$ satisfy the equations above.
+With a bit of work, we can see that with these definitions, we obtain $mincost(v) = \sum_{w \in \mathcal{T}_{P}[v]} \Delta min(w)$ where $\mathcal{T}_{P}[v]$ is the $v$-to-tree-root path in $\mathcal{T}_{P}$. We can then recover $cost(v) = mincost(v) + \Delta cost(v)$. We say that henceforth, that an operation/manipulation to the tree is \emph{field-preserving} if the fields  $\Delta min(v)$ and $\Delta cost(v)$ satisfy the equations above.
 
 \paragraph{Implementing $\textsc{PAddCost}(v, \Delta)$ and $\textsc{PFindMin}(v)$ -- the easy way.}
 First, we will discuss ways to implement $\textsc{PAddCost}$ and $\textsc{PFindMin}$ in ways that rely on the fact that $\textsc{PLink}$ and $\textsc{PCut}$ are field-preserving.
