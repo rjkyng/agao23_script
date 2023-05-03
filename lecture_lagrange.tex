@@ -298,8 +298,18 @@ This is sometimes called the Jacobian of $\cc$.
     % $\left(\grad_{\yy}L(\yy,\xx, \ss)=\matzero\right)$
   \item $\ss(i)\cdot\cc_i(\yy) = 0$ for all $i$ \hfill (complementary slackness)
   \end{itemize}
-  Then we say that $\yy, \xx, \ss$ satisfy the  \emph{Karush-Kuhn-Tucker} (KKT) conditions.
+  Then we say that $\yy, \xx, \ss$ satisfy the
+  \emph{Karush-Kuhn-Tucker} (KKT) conditions.
+  Note that because of primal-dual feasibility, we can also write
+  complementary slackness as  $\ss^T \cc(\yy)= 0$.
 \end{definition}
+
+Note that we tried to informally argued that the KKT conditions must
+hold at an optimality solution (i.e. KKT is necessary for optimality),
+but this is not quite true without additional assumptions, as shown by
+our simple counter-example $\min_{x \in R, x^2 \leq 0} x$.
+On the other hand, it turns out that KKT is always sufficient for optimality -- as
+we will prove shortly (Theorem~\ref{thm:KKTsufficient}).
 
 \subsection{Slater's Condition}
 There exists many different mild technical conditions under which the
@@ -317,7 +327,7 @@ This means that the strictly feasible point $\yytil$ lies strictly inside the se
 One way to think about Slater's condition is that your inequality
 constraints should not restrict the solution space to be
 lower-dimensional. This is a degenerate case as the sublevel sets of
-the inequality constraints are generically full-dimenensional and you
+the inequality constraints are generically full-dimensional and you
 want to avoid this degenerate case.
 
 We can also extend Slater's condition to the case when the domain $S$
@@ -337,7 +347,7 @@ To extend Slater's condition to this case, we need the notion of a ``relative in
 \begin{definition}[Relative interior] \label{def:relint}
   Given a convex set $S \subset \R^n$, the \emph{relative interior} of $S$ is
   \[
-    \operatorname{relint}(S) = \setof{x \in S : \text{ for all } \yy
+    \operatorname{relint}(S) = \setof{\xx \in S : \text{ for all } \yy
       \in S \text{ there exists } \epsilon > 0 \text{ such that }
       \xx - \epsilon(\yy - \xx) \in S}
     .
@@ -373,7 +383,7 @@ condition, the KKT are indeed necessary for optimality of our convex programs.
   $\yy, \xx, \ss$ satisfy the KKT conditions.
 \end{proposition}
 
-We will prove this lemma later, after developing some tools we will
+We will prove this proposition later, after developing some tools we will
 use in the proof.
 In fact, we will also see later that assuming Slater's condition, the KKT
 conditions are sufficient for optimality.
@@ -400,18 +410,6 @@ Given a convex program~\eqref{eq:primalprob}, we define the
 \begin{equation*} L(\yy, \xx, \ss) = \energy(\yy) +
   \xx^{\trp}(\bb-\AA\yy) + \ss^{\trp}\cc(\yy). \end{equation*}
 
-We also define a Lagrangian only in terms of the dual variables by minimizing over $\yy$ as
-\begin{equation*} L(\xx, \ss) = \min_{\yy}L(\yy, \xx,
-  \ss). \end{equation*}
-
-\end{definition}
-When $\ss \geq 0$, we have that $L(\yy,\xx,\ss)$ is a
-convex function of $\yy$.
-For each $\yy$, the Lagrangian $L(\yy, \xx,
-\ss)$ is linear in $(\xx,\ss)$ and hence also concave in them.
-Hence $L(\xx,  \ss)$ is a concave function, because it is the pointwise
-minimum (over $\yy$), of a collection of concave functions in
-$(\xx,\ss)$.
 % Notice also that when $L(\yy,\xx,\ss)$ is affine in $\xx,\ss$ and hence $L(\xx, \ss) = \min_{\yy}L(\yy, \xx,
 %   \ss)$ is concave -- because a minimum over concave functions is
 %   concave, in the same way a maximum over convex functions is convex.
@@ -437,7 +435,33 @@ Thus, for primal-dual feasible variables, the Lagrangian is always a
 lower bound on the objective value.
 
 
-$L(\xx, \ss)$ is defined by minizming $L(\yy,\xx,\ss)$ over $\yy$,
+The primal problem can be written in terms of the Lagrangian.
+\begin{equation}
+  \label{eq:primalminmax}
+  \alpha^* = \min_{\yy}\max_{\xx; \ss\geq\veczero} L(\yy, \xx, \ss)
+\end{equation}
+This is because for a minimizing $\yy$ all constraints have to be satisfied and the Lagrangian simplifies to $L(\yy,\xx,\ss) = \energy(\yy)$.
+If $\AA\xx - \bb = \veczero$ was violated, making $\xx$ large sends $L(\yy,\xx,\ss) \rightarrow \infty$.
+And if $\cc(\yy) \leq \veczero$ is violated, we can make $L(\yy,\xx,\ss) \rightarrow \infty$ by choosing large $\ss$.
+
+Note that we require $\ss \geq \veczero$, as we only want to penalize the violation of the inequality constraints in one direction, i.e.\ when $\cc(\yy) > 0$.
+
+
+We also define a Lagrangian only in terms of the dual variables by minimizing over $\yy$ as
+\begin{equation*} L(\xx, \ss) = \min_{\yy}L(\yy, \xx,
+  \ss). \end{equation*}
+
+\end{definition}
+When $\ss \geq 0$, we have that $L(\yy,\xx,\ss)$ is a
+convex function of $\yy$.
+For each $\yy$, the Lagrangian $L(\yy, \xx,
+\ss)$ is linear in $(\xx,\ss)$ and hence also concave in them.
+Hence $L(\xx,  \ss)$ is a concave function, because it is the pointwise
+minimum (over $\yy$), of a collection of concave functions in
+$(\xx,\ss)$.
+
+
+$L(\xx, \ss)$ is defined by minimizing $L(\yy,\xx,\ss)$ over $\yy$,
 i.e. what is the worst case value of the lower bound $L(\yy,\xx,\ss)$
 across all $\yy$.
 We can think of this as computing how good the given ``prices'' are at
@@ -481,16 +505,6 @@ primal-dual optimal.
 %   \max_{\substack{\xx, \ss \\ \ss \geq 0}} L(\xx,  \ss)
 %   \]
 
-The primal problem can also be written in terms of the Lagrangian.
-\begin{equation}
-  \label{eq:primalminmax}
-  \alpha^* = \min_{\yy}\max_{\xx; \ss\geq\veczero} L(\yy, \xx, \ss)
-\end{equation}
-This is because for a minimizing $\yy$ all constraints have to be satisfied and the Lagrangian simplifies to $L(\yy,\xx,\ss) = \energy(\yy)$.
-If $\AA\xx - \bb = \veczero$ was violated, making $\xx$ large sends $L(\yy,\xx,\ss) \rightarrow \infty$.
-And if $\cc(\yy) \leq \veczero$ is violated, we can make $L(\yy,\xx,\ss) \rightarrow \infty$ by choosing large $\ss$.
-
-Note that we require $\ss \geq \veczero$, as we only want to penalize the violation of the inequality constraints in one direction, i.e.\ when $\cc(\yy) > 0$.
 
 %\begin{theorem}[Weak Duality]
 For any primal-dual feasible $\yy,\xx,\ss$ we have
@@ -514,11 +528,11 @@ Using the forms in Equations~\eqref{eq:dualprob} and
 \end{theorem}
 
 
-\subsection{Strong Duality}
+\subsection{Strong Duality and KKT}
 So now that we have proved weak duality $\beta^* \leq \alpha^*$,
 what is strong duality? $\beta^* = \alpha^*$?
 The answer is yes, but strong duality only holds under some conditions.
-Again, a simple sufficient condition is Slater's condition (Definition~\ref{def:slatergeneral}.
+Again, a simple sufficient condition is Slater's condition (Definition~\ref{def:slatergeneral}).
 
 \begin{theorem}
   \label{thm:slaterstrongduality}
@@ -534,14 +548,94 @@ Note that at primal optimal $\yy^*$ and dual optimal $\xx^*,
   \geq \beta^* = \alpha^*
   .
 \]
-Thus, we can conclude that $L(\yy^*, \xx^*, \ss^*) = \alpha^* = \beta^*$.
+Thus, we can conclude that $L(\yy^*, \xx^*, \ss^*) = \alpha^* =
+\beta^*$.
+
+\paragraph{KKT is sufficient for optimality.}
+We introduced the KKT conditions by informally thinking about
+conditions that should be true at a local extremum.
+In fact, for convex problems (with sufficient differentiability), the
+KKT conditions are sufficient for optimality, as the
+next theorem shows.
+As a bonus, we also get strong duality when they hold.
+\begin{theorem}
+  \label{thm:KKTsufficient}
+   Consider a convex program \eqref{eq:primalprob} with an open domain
+  set $S$.
+   Then if the KKT conditions hold at $(\yytil,\xxtil,\sstil)$, they must be
+   primal-dual optimal, and strong duality must hold.
+\end{theorem}
+\begin{proof}
+  $\yytil$ is global minimizer of $\yy \mapsto L(\yy, \xxtil, \sstil)$, since this function is convex with vanishing gradient at $\yytil$. Hence,
+  \[ L(\yytil, \xxtil, \sstil) = \inf_{\yy} L(\yy, \xxtil, \sstil) = L(\xxtil,\sstil) \leq \beta^*. \]
+  On the other hand, due to primal feasibility and complementary slackness,
+  \[ L(\yytil,\xxtil,\sstil) = \calE(\yytil) + \xxtil^\trp(\bb-\AA^\trp\yytil) + \sstil^\trp\cc(\yytil) = \calE(\yytil) \geq \alpha^*. \]
+  Thus, $\beta^*\geq\alpha^*$. But also $\beta^*\leq\alpha^*$ by weak duality. Therefore, $\beta^*=\alpha^*$ and $\yytil,\xxtil,\sstil$ are primal/dual optimal.
+\end{proof}
+
+\paragraph{When strong duality holds, KKT is necessary for
+  optimality.}
+When strong duality holds, the KKT conditions must necessarily hold at
+any optimal solution.
+
+ Consider a convex program \eqref{eq:primalprob} with an open set $S$
+ as its domain.
+Suppose $\yy^*$ is an optimizer of the primal problem and $\xx^*,
+\ss^*$ for the dual, and suppose that strong duality holds.
+We thus have
+\[ L(\yy^*, \xx^*, \ss^*) = \alpha^* = \beta^*. \]
+Because $L(\yy, \xx^*, \ss^*)$ is a convex function in $\yy$, it also
+follows that as $\energy: S \to \R$ and $\cc$ are differentiable then we must have that the
+gradient w.r.t. $\yy$ is zero, i.e.
+\begin{equation}
+  \left.\grad_{\yy}L(\yy, \xx^*,
+    \ss^*)\right|_{\yy=\yy^*} = 0
+  \label{eq:KKTgradAtOpt}
+\end{equation}
+This says exactly that the KKT gradient condition holds at $(\yy^*, \xx^*, \ss^*)$ .
+% and plugging in
+% \[ L(\yy, \xx^*, \ss^*) = \energy(\yy) + \xx^{\trp}(\bb - \AA\yy) + \ss^{\trp}\cc(\yy) \]
+% yields
+% \begin{equation*} \grad\energy(\yy) + \xx^{\trp}\grad_y(\bb-\AA\yy) + \ss^{\trp}\grad\cc(\yy) = \veczero. \end{equation*}
+% And this connects to our point of the parallel gradients from the beginning of this section.
+
+Next, we want to confirm that complementary slackness holds for our
+optimal pair $(\yy^*, \xx^*, \ss^*)$.
+We can see that
+\begin{equation*}\energy(\yy^*) =  \alpha^* = \energy(\yy^*) + \xx^{\trp}(\bb - \AA\yy^*) + \ss^{\trp}\cc(\yy^*) = \energy(\yy^*) + \ss^{\trp}\cc(\yy^*) \end{equation*}
+and hence when the $i$-th convex constraint is not active, i.e.\ $c_i(\yy^*) < 0$ the \emph{slack} must be zero, i.e.\ $\ss(i) = 0$.
+Conversely if the slack is non-zero, that is $\ss(i) \neq 0$ implies
+that the constraint is active, i.e.\ $c_i(\yy^*) = 0$.
+This says precisely that the complementary slackness condition holds
+at primal-dual optimal $(\yy^*, \xx^*, \ss^*)$.
+Combined with our previous observation
+Equation~\eqref{eq:KKTgradAtOpt}, we get the following result.
+
+\begin{theorem}
+  \label{thm:KKTgradAtOptStrongDual}
+  Consider a convex program \eqref{eq:primalprob} with an open domain
+  set $S$ and whose dual satisfies strong duality.  
+Then  KKT conditions necessarily hold at primal-dual
+  optimal $(\yy^*, \xx^*, \ss^*)$.
+\end{theorem}
+
+Theorem~\ref{thm:KKTgradAtOptStrongDual} combined with
+Theorem~\ref{thm:slaterstrongduality} immediately
+imply Proposition~\ref{pro:KKTnecessary}.
+
+A good reference for basic convex duality theory is Boyd's free online book ``Convex
+optimization'' (linked to on the course website).
+It provides a number of different interpretations of duality. One
+particularly interesting one comes from economics:
+economists see the slack variables $\ss$ as prices for violating the constraints.
 
 
+\subsection{Proof that Slater's Condition Implies Strong Duality}
 
+In this section, we'll prove Theorem~\ref{thm:slaterstrongduality}.
 % Theorem~\ref{thm:slaterstrongduality} also holds given the general
 % Slater's condition of Definition~\ref{def:slatergeneral}.
-
-\paragraph{How are we going to prove this?} Before we prove the theorem, let's make a few observations to get us
+But, before we prove the theorem, let's make a few observations to get us
 warmed up. If you get bored, skip ahead to the proof.
 
 It is sufficient to prove that $\alpha^* \leq \beta^*$, as the statement then follows in conjunction with weak duality.
@@ -751,78 +845,12 @@ These two sets $A,B$ are illustrated in \autoref{fig:ab}.
 
 
 
-\subsection{KKT Revisited}
-Let's come back to our earlier discussion of parallel gradients and the
-KKT conditions.
- Consider a convex program \eqref{eq:primalprob} with an open set $S$
- as its domain.
-Suppose $\yy^*$ is an optimizer of the primal problem and $\xx^*,
-\ss^*$ for the dual, and suppose that strong duality holds.
-We thus have
-\[ L(\yy^*, \xx^*, \ss^*) = \alpha^* = \beta^*. \]
-Because $L(\yy, \xx^*, \ss^*)$ is a convex function in $\yy$, it also
-follows that as $\energy: S \to \R$ and $\cc$ are differentiable then we must have that the
-gradient w.r.t. $\yy$ is zero, i.e.
-\begin{equation}
-  \left.\grad_{\yy}L(\yy, \xx^*,
-    \ss^*)\right|_{\yy=\yy^*} = 0
-  \label{eq:KKTgradAtOpt}
-\end{equation}
-This says exactly that the KKT gradient condition holds at $(\yy^*, \xx^*, \ss^*)$ .
-% and plugging in
-% \[ L(\yy, \xx^*, \ss^*) = \energy(\yy) + \xx^{\trp}(\bb - \AA\yy) + \ss^{\trp}\cc(\yy) \]
-% yields
-% \begin{equation*} \grad\energy(\yy) + \xx^{\trp}\grad_y(\bb-\AA\yy) + \ss^{\trp}\grad\cc(\yy) = \veczero. \end{equation*}
-% And this connects to our point of the parallel gradients from the beginning of this section.
-
-\paragraph{Complementary slackness.}
-We can also see that
-\begin{equation*}\energy(\yy^*) =  \alpha^* = \energy(\yy^*) + \xx^{\trp}(\bb - \AA\yy^*) + \ss^{\trp}\cc(\yy^*) = \energy(\yy^*) + \ss^{\trp}\cc(\yy^*) \end{equation*}
-and hence when the $i$-th convex constraint is not active, i.e.\ $c_i(\yy^*) < 0$ the \emph{slack} must be zero, i.e.\ $\ss(i) = 0$.
-Conversely if the slack is non-zero, that is $\ss(i) \neq 0$ implies
-that the constraint is active, i.e.\ $c_i(\yy^*) = 0$.
-This says precisely that the complementary slackness condition holds
-at primal-dual optimal $(\yy^*, \xx^*, \ss^*)$.
-Combined with our previous observation
-Equation~\eqref{eq:KKTgradAtOpt}, we get the following result.
-
-\begin{theorem}
-  \label{thm:KKTgradAtOptStrongDual}
-  Consider a convex program \eqref{eq:primalprob} with an open domain
-  set $S$ and whose dual satisfies strong duality.  
-Then  KKT conditions necessarily hold at primal-dual
-  optimal $(\yy^*, \xx^*, \ss^*)$.
-\end{theorem}
-
-Theorem~\ref{thm:KKTgradAtOptStrongDual} combined with
-Theorem~\ref{thm:slaterstrongduality} immediately
-imply Proposition~\ref{pro:KKTnecessary}.
-
-\paragraph{KKT is sufficient.}
-We've seen that when strong duality holds, the KKT conditions are
-necessary for optimality. In fact, they're also sufficient for optimality, as the
-next theorem shows. And in this case, we do not need to assume
-strong duality, as now it is implied by the KKT conditions. 
-\begin{theorem}
-   Consider a convex program \eqref{eq:primalprob} with an open domain
-  set $S$.
-   Then if the KKT conditions hold at $(\yytil,\xxtil,\sstil)$, they must be
-   primal-dual optimal, and strong duality must hold.
-\end{theorem}
-\begin{proof}
-  $\yytil$ is global minimizer of $\yy \mapsto L(\yy, \xxtil, \sstil)$, since this function is convex with vanishing gradient at $\yytil$. Hence,
-  \[ L(\yytil, \xxtil, \sstil) = \inf_{\yy} L(\yy, \xxtil, \sstil) = L(\xxtil,\sstil) \leq \beta^*. \]
-  On the other hand, due to primal feasibility and complementary slackness,
-  \[ L(\yytil,\xxtil,\sstil) = \calE(\yytil) + \xxtil^\trp(\bb-\AA^\trp\yytil) + \sstil^\trp\cc(\yytil) = \calE(\yytil) \geq \alpha^*. \]
-  Thus, $\beta^*\geq\alpha^*$. But also $\beta^*\leq\alpha^*$ by weak duality. Therefore, $\beta^*=\alpha^*$ and $\yytil,\xxtil,\sstil$ are primal/dual optimal.
-\end{proof}
 
 
-A good reference for basic convex duality theory is Boyd's free online book ``Convex
-optimization'' (linked to on the course website).
-It provides a number of different interpretations of duality. One
-particularly interesting one comes from economics:
-economists see the slack variables $\ss$ as prices for violating the constraints.
+
+
+
+
 
 %\end{document}
 %%% Local Variables:
