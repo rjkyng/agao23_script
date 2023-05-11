@@ -409,28 +409,40 @@ where $\alpha$ is the step size and it will be decided later.
     &\leq \calE(\yy) - \frac{1}{2(K+1)^2}\grad_{\yy}\calE(\yy)^\trp \HH_{\calE}^{-1}(\yy) \grad_{\yy}\calE(\yy) \\
     &\leq \calE(\yy) - \frac{1}{2(K+1)^3}\grad_{\yy}\calE(\yy)^\trp \AA^{-1} \grad_{\yy}\calE(\yy) \\
     & (\text{subtract } \calE(\yy^*) \text{ on both sides}) \\
-    \calE(\yy+\ddelta^*)-\calE(\yy^*) &\leq \calE(\yy)-\calE(\yy^*) - \frac{1}{2(K+1)^3}\underbrace{\grad_{\yy}\calE(\yy)^\trp \AA^{-1} \grad_{\yy}\calE(\yy)}_{=:\sigma}
+    \calE(\yy+\ddelta^*)-\calE(\yy^*) &\leq \calE(\yy)-\calE(\yy^*) -
+                                        \frac{1}{2(K+1)^3}\underbrace{\grad_{\yy}\calE(\yy)^\trp
+                                        \AA^{-1}
+                                        \grad_{\yy}\calE(\yy)}_{=:\sigma}
+                                            \numberthis \label{eq:idk1}
   \end{align*}
   where the second inequality is due to $K$-stability of the inverse Hessian,
   \[ \frac{1}{1+K}\AA^{-1} \preceq \HH_{\calE}(\yy)^{-1} \preceq (1+K)\AA^{-1}. \]
-  Meanwhile, using Taylor's theorem and $K$-stability, for some
-  $\hat{\yy}$ between $\yy$ and $\yy^*$,
-  and noting $\grad\calE(\yy^*) = \veczero$, we have
+  Meanwhile, by convexity, we also have 
   \begin{align*}
-    \calE(\yy) &= \calE(\yy^*) + \grad\calE(\yy^*)^\trp(\yy-\yy^*) + \frac{1}{2}(\yy-\yy^*)^\trp \HH_{\calE}(\hat{\yy})(\yy-\yy^*)  \\
-    \calE(\yy)-\calE(\yy^*) &\leq \frac{(K+1)}{2}\underbrace{(\yy-\yy^*)^\trp\AA(\yy-\yy^*)}_{=:\gamma}
+    \calE(\yy)- \calE(\yy^*)
+    \leq
+    \underbrace{ (\yy-\yy^*)^\trp\grad\calE(\yy) }_{=:\gamma}
   \end{align*}
+  % using Taylor's theorem and $K$-stability, for some
+  % $\hat{\yy}$ between $\yy$ and $\yy^*$,
+  % and noting $\grad\calE(\yy^*) = \veczero$, we have
+  % \begin{align*}
+  %   \calE(\yy) &= \calE(\yy^*) + \grad\calE(\yy^*)^\trp(\yy-\yy^*) + \frac{1}{2}(\yy-\yy^*)^\trp \HH_{\calE}(\hat{\yy})(\yy-\yy^*)  \\
+  %   \calE(\yy)-\calE(\yy^*) &\leq \frac{(K+1)}{2}\underbrace{(\yy-\yy^*)^\trp\AA(\yy-\yy^*)}_{=:\gamma}
+  % \end{align*}
   Next, our task is reduced to comparing $\sigma$ and $\gamma$.
-  $\yy_t := \yy^* + t(\yy-\yy^*)$ ($t\in[0,1]$) is a point on the segment connecting $\yy^*$ and $\yy$. Since
-  \[ \grad\calE(\yy) = \grad\calE(\yy) - \grad\calE(\yy^*) = \int_{0}^{1} H(\yy_t)(\yy-\yy^*)\df t, \]
-  then
-  \begin{align*}
-    (\yy-\yy^*)^\trp\grad\calE(\yy)
-    &= \int_{0}^{1} (\yy-\yy^*)^\trp H(\yy_t)(\yy-\yy^*)\df t \\
-    &\geq \frac{1}{K+1}\int_{0}^{1} (\yy-\yy^*)^\trp\AA(\yy-\yy^*)\df t \\
-    &= \frac{\gamma}{K+1} \numberthis \label{eq:idk1}
-  \end{align*}
-  On the other hand, define $\zz_s = \grad\calE(\yy^*) + s(\grad\calE(\yy)-\grad\calE(\yy^*))$ and then $\df\zz_s = \grad\calE(\yy)\df s$.
+  % $\yy_t := \yy^* + t(\yy-\yy^*)$ ($t\in[0,1]$) is a point on the segment connecting $\yy^*$ and $\yy$. Since
+  % \[ \grad\calE(\yy) = \grad\calE(\yy) - \grad\calE(\yy^*) = \int_{0}^{1} H(\yy_t)(\yy-\yy^*)\df t, \]
+  % then
+  % \begin{align*}
+  %   (\yy-\yy^*)^\trp\grad\calE(\yy)
+  %   &= \int_{0}^{1} (\yy-\yy^*)^\trp H(\yy_t)(\yy-\yy^*)\df t \\
+  %   &\geq \frac{1}{K+1}\int_{0}^{1} (\yy-\yy^*)^\trp\AA(\yy-\yy^*)\df t \\
+  %   &= \frac{\gamma}{K+1} \numberthis \label{eq:idk1}
+  % \end{align*}
+  % On the other hand,
+  
+  We define $\zz_s = \grad\calE(\yy^*) + s(\grad\calE(\yy)-\grad\calE(\yy^*))$ and then $\df\zz_s = \grad\calE(\yy)\df s$.
   Using \emph{Theorem \ref{thm:conjugate}}, we have
   \[ \yy-\yy^* = \int_{0}^{1} \HH_{\calE^*}(\zz_s) \grad\calE(\yy) \df s.\]
   Then,
@@ -441,14 +453,14 @@ where $\alpha$ is the step size and it will be decided later.
     &\leq (K+1)\sigma \numberthis \label{eq:idk2}
   \end{align*}
   Combining (\ref{eq:idk1}) and (\ref{eq:idk2}) yields
-  \[ \gamma \leq (K+1)^2\sigma. \]
-  Therefore,
-  \[ \calE(\yy+\ddelta^*)-\calE(\yy^*) \leq (\calE(\yy)-\calE(\yy^*))\left(1-\frac{1}{(K+1)^6}\right). \]
+  % \[ \gamma \leq (K+1)^2\sigma. \]
+  % Therefore,
+  \[ \calE(\yy+\ddelta^*)-\calE(\yy^*) \leq (\calE(\yy)-\calE(\yy^*))\left(1-\frac{1}{2(K+1)^4}\right). \]
 \end{proof}
 
 \begin{remark}
   The basic idea of relating $\sigma$ and $\gamma$ in the above proof is writing the same quantity, $\grad\calE(\yy)^\trp(\yy-\yy^*)$,  as two integrations along different lines.
-  $(K+1)^6$ can be reduced to $(K+1)^2$ and even to $(K+1)$ with more care.
+  $(K+1)^4$ can be reduced to $(K+1)^2$ and even to $(K+1)$ with more care.
   In some settings, Newton's method converges in $\log\log(1/\epsilon)$ steps.
 \end{remark}
 
@@ -553,7 +565,7 @@ Finally, the solutions to (\ref{eq:finally}) are
 \end{cases}\]
 It is easy to verify that $\BB\ddelta^* = \matzero$. Thus, our update rule is $\ff_{i+1} = \ff_{i} + \ddelta^*$. And we have the following convergence result.
 \begin{theorem}
-  $\hcalE(\ff_k)-\hcalE(\ff^*) \leq \epsilon \cdot \big(\hcalE(\ff_0)-\hcalE(\ff^*)\big)$ when $k>(K+1)^6\log(1/\epsilon)$.
+  $\hcalE(\ff_k)-\hcalE(\ff^*) \leq \epsilon \cdot \big(\hcalE(\ff_0)-\hcalE(\ff^*)\big)$ when $k>2(K+1)^4\log(1/\epsilon)$.
 \end{theorem}
 
 \begin{remark}
