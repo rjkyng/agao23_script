@@ -1,39 +1,65 @@
 \chapter{Negative Single-Source Shortest Paths}
 
-In this lecture, we prove the following result.
+In this lecture, we are interested in the following result. It says that even in graphs with negative edge weights, we can find the single-source shortest paths in near-linear time! This result has been obtained extremely recently and the algorithm is a beautiful combination of some of the most useful modern graph algorithmic techniques.
 
-\begin{theorem}
-Given an undirected graph $G=(V,E, \ww)$ with $\ww \in \{-1, 1\}$ such that there exists no negative cycle in $G$,  and a dedicated source vertex $s \in V$, the distances $\mathbf{dist}_G(s,t)$ can be computed in time $\tilde{O}(m)$.
+\begin{theorem}\label{thm:negativeSSSPBNW}
+Given a directed graph $G=(V,E, \ww)$ with $\ww \in \mathbb{R}^V$ such that there exists no negative cycle in $G$,  and a dedicated source vertex $s \in V$, the distances $\mathbf{dist}_G(s,t)$ can be computed in time $\tilde{O}(m \log(W))$ where  $W = \max_{e \in E} |w(e)|$, i.e. $W$ is the largest absolute weight.
 \end{theorem}
 
-
-Using the same techniques but refining them one gets the following more general theorem. We sketch in the end of the lecture how to extend the techniques introduced in this lecture to obtain the more general result.
+Since the precise combination of the underlying tools is still a bit involved,  the lecture will mainly focus on  the special case where $G$ is undirected and all weights are either $+1$ or $-1$, i.e. $\ww \in \{+1,-1\}^V$.  We will also obtain a worse runtime.  The result that we will formally prove is stated below.
 
 \begin{theorem}
-Given a directed graph $G=(V,E, \ww)$ with $\ww \in \mathbb{R}$ such that there exists no negative cycle in $G$,  and a dedicated source vertex $s \in V$, the distances $\mathbf{dist}_G(s,t)$ can be computed in time $\tilde{O}(m \log(W))$ where  $W = \max_{e \in E} |w(e)|$, i.e. $W$ is the largest absolute weight.
+Given an undirected graph $G=(V,E, \ww)$ with $\ww \in \{-1, 1\}$ such that there exists no negative cycle in $G$,  and a dedicated source vertex $s \in V$, the distances $\mathbf{dist}_G(s,t)$ can be computed in time $\tilde{O}(m^{3/2})$.
 \end{theorem}
+
+In the end of the lecture, we will the review the techniques and sketch how to refine them to obtain the more general theorem \Cref{thm:negativeSSSPBNW}.  However, for a rigorous proof, we have to refer you to the article. 
+
 
 \section{A Brief Recap: Classic Algorithms for Handling Negative Weights}
 
-The classic algorithm that should come to mind when computing single-source shortest paths is Bellman-Ford's algorithm. The algorithm works by initializing distance estimates $\hat{d}(s, u)$ with infinity and $\hat{d}(s,s)$ with $0$. It then proceeds for $n$ rounds by relaxing the edge set in every round.  
+\paragraph{Classic Bellman-Ford.} The classic algorithm that should come to mind when computing single-source shortest paths with negative weights is Bellman-Ford's algorithm. The algorithm works by initializing distance estimates $\hat{d}(s, u)$ with infinity and $\hat{d}(s,s)$ with $0$. It then proceeds for $n$ rounds by relaxing the edge set in every round. 
 
 \begin{algorithm}
 $\forall u \in V \setminus \{s\}, \hat{d}(s, u) \gets \infty$; $\hat{d}(s,s) \gets 0$.\\
 \For{$i = 1, 2, \ldots, n$}{
 	\ForEach{$e = (u,v) \in E$}{
-		$\hat{d}(s, v) \gets \hat{d}(s, u) + w(e)$
+		$\hat{d}(s, v) \gets \min\{\hat{d}(s, v) ,  \hat{d}(s, u) + w(e)\}$
 	}
 }
 \Return $\{\hat{d}(s, v) \}_v$
 \caption{$\textsc{BellmanFord}(G,s)$}
+\label{alg:bellmanFord}
 \end{algorithm}
+
+The following theorem summarizes the guarantees of the algorithm.
+
+\begin{theorem}
+Algorithm \ref{alg:bellmanFord} takes as input a directed, weighted graph $G=(V,E, \ww)$ where weights are allowed to be negative, but that contains no negative cycle; and a source vertex $s \in V$. It runs in time $O(mn)$ and outputs the correct distances from $s$ to every vertex $v \in V$. 
+\end{theorem}
+\begin{proof}
+The algorithm runs for $n$ iterations and relaxes $m$ edges in each iteration, each in $O(1)$ time. This establishes the runtime.
+
+We prove correctness by induction. We prove that after the $h$-th iteration of the algorithm, for all vertices $v$ that have a shortest path consisting of at most $h$ edges have $\hat{d}(s,v)$ is equal to the real $s$ to $v$ distance.
+
+The base case $h = 0$ is trivial because $\hat{d}(s,s)$ is initialized to $0$. For the inductive step $h \mapsto h+1$, we use the subpath property of shortest paths, that is, for any $v$ that has an shortest $s$ to $v$ shortest path consisting of exactly $h+1$ edges, we have that for the vertex $u$ preceding $v$ on this path, we have that the subpath from $s$ to $u$ is a shortest path itself and has clearly $<h+1$ edges (it is easy to establish the subpath property via a proof by contradiction). Thus in the $h+1$-th iteration, when the edge $e = (u,v)$ is relaxed, we have $\hat{d}(s, v) \gets \hat{d}(s, u) + w(e)= \mathbf{dist}_G(s,u) + w(e) = \mathbf{dist}_G(s,v)$.
+\end{proof}
+
+\paragraph{A Heuristic for Speeding-Up Bellman-Ford.} If you think a bit longer about Bellman-Ford and why you cannot use Dijkstra, you might actually stumble upon the following idea that might improve runtime in practice: consider that there is a shortest path from $s$ to $v$ that consists of at most $h$ negative edges. Then, we could try to relax negative edges by Bellman-Ford, and relax all non-negative edges between two consecutive edges on the shortest path by using Dijlstra's algorithm.  
+
+Let us make that intuition precise.
+
+\begin{definition}
+Given a directed, weighted graph $G=(V,E,\ww)$ with negative weights but no negative cycle and a dedicated source $s \in V$. For any vertex $v \in V$, we let $\eta(v)$ be the minimum number of negative edges on any shortest $s$ to $v$ path. We define $\eta(G) = \min_v \eta(v)$. 
+\end{definition}
+
+The pseudo-code below now formalizes our intuitive approach. It reduces the number of iterations from $n$ to $\eta(G)$ which is always upper bounded by $n$ (in a graph without negative cycles). Note that $\eta(G)$ can also be computed efficiently since one can stop the algorithm simply after a round where no distance estimate was improved which is exactly after the $(\eta(G) +1)$-th iteration. 
 
 \begin{algorithm}
 $\forall u \in V \setminus \{s\}, \hat{d}(s, u) \gets \infty$; $\hat{d}(s,s) \gets 0$.\\
-\For{$i = 1, 2, \ldots, n$}{
+\For{$i = 1, 2, \ldots, \eta(G)$}{
 	\tcc{Relaxation via Bellman-Ford.}
 	\ForEach{$e = (u,v) \in E$}{
-		$\hat{d}(s, v) \gets \hat{d}(s, u) + w(e)$.
+		$\hat{d}(s, v) \gets\min\{\hat{d}(s, v) ,  \hat{d}(s, u) + w(e)\}$.
 	}
 
 	\tcc{Relaxation via Dijkstra's Algorithm.}	
@@ -41,18 +67,27 @@ $\forall u \in V \setminus \{s\}, \hat{d}(s, u) \gets \infty$; $\hat{d}(s,s) \ge
 	\While{$Q \neq \emptyset$}{
 		Let $u$ be the vertex in $Q$ that has smallest $ \hat{d}(s, u)$.\\ 
 		\ForEach{$e = (u,v) \in E, w(e) \geq 0$}{
-			$\hat{d}(s, v) \gets \hat{d}(s, u) + w(e)$.
+			$\hat{d}(s, v) \gets \min\{\hat{d}(s, v) ,  \hat{d}(s, u) + w(e)\}$.
 		}
 	}
 }
 \Return $\{\hat{d}(s, v) \}_v$
-\caption{$\textsc{BellmanFord}(G,s, \eta)$}
+\caption{$\textsc{BellmanFord}(G,s)$}
+\label{alg:embellishedBellmanFord}
 \end{algorithm}
 
+We can now prove the following theorem which prove that the algorithm above is faster at least for the special case when $\eta(G)$ is much smaller than $n$.
 
+\begin{theorem}
+Algorithm \ref{alg:embellishedBellmanFord} runs in time $O((\eta(G) + 1) m \log(n))$ time and outputs the correct $s$ to $v$ distances.
+\end{theorem}
+\begin{proof}[Proof Sketch]
+The runtime is clear.  For correctness, let us assume that all outgoing edges from $s$ are negative (this is w.l.o.g. since we can add a dummy-source $s'$ and add an edge of weight $-1$ from $(s', s)$. The distances from $s'$ are then the distance from $s$ offset by additive $-1$).  
 
+Then correctness follows by induction on $\eta(v)$, i.e. after the $h$-th round of the algorithm, we have for all vertices $v \in V$ with $\eta(v) \leq h$, that $\hat{d}(s,v) = \mathbf{dist}_G(s,v)$. The base case is again trivial. For the inductive step $h \mapsto h+1$, we have that for any $v$ with $\eta(v) = h+1$, by the subpath property, we have that the vertex $u$ just before the last negative edge on the shortest $s$ to $v$ path of $h+1$ edges, that $\hat{d}(u)$ is equal to the real distance after round $h$. But in round $h+1$, the outgoing negative edges of $u$ are relaxed in the Bellman-Ford relaxation and thus the first vertex after the negative edge is assigned its correct distance. And then after running our version of Dijkstra, every non-positive edge is relaxed in the correct order.
+\end{proof}
 
-
+\paragraph{All-Pairs Shortest Paths in Negative-Weight Graphs via Price Function.} While we are at reviewing classic algorithms, let us also briefly review Johnson's algorithms.
 
 \begin{definition}[Price Function]
 For any vector $\mathbf{\phi} \in \mathbb{R}$, we say $\phi$ is a \emph{price function} if $\ww_{\mathbf{\phi}} = \ww + \BB^{\trp} \mathbf{\phi} > \veczero$, i.e. where for each edge $e = (u,v) \in E$ oriented from $u$ to $v$, we have that $\ww(e) + \phi(u) - \phi(v) > 0$.
