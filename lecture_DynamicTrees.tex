@@ -79,7 +79,7 @@ To distinguish the routines we develop for paths from those we develop for the g
 \paragraph{Representing Paths via Balanced Binary Search Trees.} It turns out that paths can be represented rather straight-forwardly via Balanced Binary Search Trees, with an node/item for each vertex of the graph. For the sake of concreteness, we here use \emph{treaps} to represent paths\footnote{If you have not seen treaps before, don't worry, they are simple enough to understand them from our application here. }.
 Most other balanced binary search trees would also work.
 
-Note that we now represent each rooted path with a tree, and this tree as its own root, which is usually \emph{not} the root of othe path. To minimize confusion, we will refer to the root of the path as the \emph{path-root} and the root of the associated tree as the \emph{tree-root} (or \emph{subtree-root} for the root of a subtree).
+Note that we now represent each rooted path with a tree, and this tree has its own root, which is usually \emph{not} the root of the path. To minimize confusion, we will refer to the root of the path as the \emph{path-root} and the root of the associated tree as the \emph{tree-root} (or \emph{subtree-root} for the root of a subtree).
 
 In our earlier discussion of binary trees, we always assumed each item has a key: Instead we will now let the key of each vertex correspond to its distance to the path-root in the path that contains it.
 We will make sure the treap respects the search property w.r.t. this set of keys/ordering, but we will not actually explicitly compute these keys or store them.
@@ -87,7 +87,7 @@ Note one important difference to the scenario of treaps-with-keys: When we have 
 
 Let us describe how to represent a path $P$ in $G$. First, we pick for each vertex $v$, we assign it a \emph{priority} denoted $\prio(v)$, which we choose to be a uniformly random integer sampled from a large universe, say $[1, n^{100})$. We assume henceforth that $\prio(v) \neq \prio(w)$ for all $v \neq w \in V$.
 
-Then, for each path $P$ in $G$, we store the vertices in $P$ in a binary tree, in particular a treap, $\mathcal{T}_{P}$ and enforce the following invariants:
+Then, for each path $P$ in $G$, we store the vertices of $P$ in a binary tree, in particular a treap, $\mathcal{T}_{P}$ and enforce the following invariants:
 \begin{itemize}
       \item \textbf{Search-Property}: for all $v$, $left_{\mathcal{T}_{P}}(v)$ precedes $v$ on $P$ and $right_{\mathcal{T}_{P}}(v)$ appears later on $P$ than $v$. See the Figure~\ref{fig:PathAsTreap} below for an illustration.
     \item \textbf{Heap-Order}: for each vertex $v \in P$, its parent $w = parent_{\mathcal{T}_{P}}(v)$ in $\mathcal{T}_{P}$ is either $NULL$ (if $v$ is the path-root) or has $\prio(v) > \prio(w)$.
@@ -128,12 +128,12 @@ With a bit of work, we can see that with these definitions, we obtain $mincost(v
 \paragraph{Implementing $\textsc{PAddCost}(v, \Delta)$ and $\textsc{PFindMin}(v)$ -- the easy way.}
 First, we will discuss ways to implement $\textsc{PAddCost}$ and $\textsc{PFindMin}$ in ways that rely on the fact that $\textsc{PLink}$ and $\textsc{PCut}$ are field-preserving.
 
-$\textsc{PAddCost}(v, \Delta)$ is very easy: First, consider the case when $v$ as no precessor on the path. If this is the case, we can simply find the tree-root of the tree $\mathcal{T}_{P}$ containing $v$ and at this root increase the value of the field $mincost$ by $\Delta$. This implicitly increases the cost of all nodes in the tree by $\Delta$.
-Second, consider the case when $v$ has a precessor $u$ in the path (we can store these explicitly, or we can search for it in the tree). Call $\textsc{PCut}(u,v)$ -- now $v$ no longer has a precessor and we can proceed as before. Finally, call $\textsc{PLink}(u,v)$. That's it.
+$\textsc{PAddCost}(v, \Delta)$ is very easy: First, consider the case when $v$ has no predecessor on the path. If this is the case, we can simply find the tree-root of the tree $\mathcal{T}_{P}$ containing $v$ and at this root increase the value of the field $mincost$ by $\Delta$. This implicitly increases the cost of all nodes in the tree by $\Delta$.
+Second, consider the case when $v$ has a predecessor $u$ in the path (we can store these explicitly, or we can search for it in the tree). Call $\textsc{PCut}(u,v)$ -- now $v$ no longer has a predecessor and we can proceed as before. Finally, call $\textsc{PLink}(u,v)$. That's it.
 
-Implemeting  $\textsc{PFindMin}(v)$ is also very easy: First, consider the case when $v$ as no precessor on the path.  Again, we can find the tree-root $r$ of the tree $\mathcal{T}_{P}$ containing $v$.
+Implemeting  $\textsc{PFindMin}(v)$ is also very easy: First, consider the case when $v$ has no predecessor on the path.  Again, we can find the tree-root $r$ of the tree $\mathcal{T}_{P}$ containing $v$.
 By definition $mincost(r)$ is the minimum cost across the whole tree, and hence across the path between $v$ and the path-root. We can also find the node with the minimum cost: Search in the tree, starting from the tree-root, and, if possible follow the child where $\Delta min(v)=0$ (going left if both are eligible). Eventually, we get to a node where there is no child with $\Delta min(v) = 0$. This must be a minimizer.
-Now, to deal with the case where $v$ has a precessor, we do the same we did for $\textsc{PAddCost}$: Find the precessor $u$, call  $\textsc{PCut}(u,v)$, then find the minimizer, finally call  $\textsc{PLink}(u,v)$.
+Now, to deal with the case where $v$ has a predecessor, we do the same we did for $\textsc{PAddCost}$: Find the predecessor $u$, call  $\textsc{PCut}(u,v)$, then find the minimizer, finally call  $\textsc{PLink}(u,v)$.
 
 \paragraph{Implementing $\textsc{PAddCost}(v, \Delta)$ and $\textsc{PFindMin}(v)$ -- the hard way.}
 We can also implement $\textsc{PAddCost}(v, \Delta)$ and $\textsc{PFindMin}(v)$ without relying on $\textsc{PLink}$ and $\textsc{PCut}$, which is more efficient, but also more unpleasant\footnote{You don't have to know these more complicated approaches for the exam, but we include them for the interested reader.}.

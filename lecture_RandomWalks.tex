@@ -216,7 +216,7 @@ We compute the rest of the vector by writing down a system of equations that rec
 
 We can express this algebraically by
 \[
-\hh_a = 1 + \sum_{a \sim b} \mathbb{P}[v_{t+1} = a \;| v_t = b]  \cdot \hh(b) = 1 + \sum_{a \sim b} \frac{\ww(a,b)}{\dd(b)}  \cdot \hh(b) =  1 + (\WW\vecone_a)^{\trp} \hh = 1 + \vecone_a^{\trp} \WW^{\trp} \hh.
+\hh_a = 1 + \sum_{a \sim b} \mathbb{P}[v_{t+1} = b \;| v_t = a]  \cdot \hh(b) = 1 + \sum_{a \sim b} \frac{\ww(a,b)}{\dd(a)}  \cdot \hh(b) =  1 + (\WW\vecone_a)^{\trp} \hh = 1 + \vecone_a^{\trp} \WW^{\trp} \hh.
 \]
 Using that $\hh(a) = \vecone_a^{\trp} \hh =  \vecone_a^{\trp} \II \hh$, we can rewrite this as 
 \[
