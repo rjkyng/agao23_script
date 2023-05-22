@@ -1,0 +1,194 @@
+
+\chapter{Low-Diameter Decompositions}
+
+In this chapter, we learn about an algorithm that clusters vertices in graphs by their distance. This clustering is often referred to as \emph{low-diameter decomposition}. We define this concept below and give one of the most versatile and robust algorithms.
+
+\begin{definition}
+Given an undirected graph $G = (V,E,w)$ with non-negative weights $\ww \in \mathbb{R}_{\geq 0}$. We say that a partition $X_1, X_2, \ldots, X_k$ of $V$ and a set of edges $E_{del} = \{ (u,v) \in E \;|\; u \in X_i, v \in X_j, i \neq j\}$ form a $(D, \alpha)$-low-diameter decomposition of $G$ if
+\begin{enumerate}
+\item for every $i \in [1, k]$ and $u,v \in X_i$, we have $\mathbf{dist}_{G[X_i]}(u,v) \leq \alpha D$, and
+\item $\forall e \in E$, $\mathbb{P}[e \in E_{del}] \leq w(e)/ D$, and
+\end{enumerate}
+\end{definition}
+\begin{remark}
+The definition above is with respect to an implicit distribution $\mathcal{D}$ over partition sets $\mathcal{X}$. A more precise statement would be to say that for a distribution $\mathcal{D}$ over partition sets of $V$, we say that $\mathcal{D}$ is an $(D, \alpha)$-LDD-distribution if sampling a partition from $\mathcal{D}$ yields the properties stated above. We will refrain from that here, however.
+\end{remark}
+\begin{remark}
+Instead of second property, LDDs are often defined to have the weight of edges in $E_{del}$ to be a small fraction of the edges. For unweighted graphs, the best one can hope for is essentially at most $m/D$ intercluster edges $E_{del}$ in total. The above definition allows to obtain this property in expectation. Defined this way, we also have already seen a reasonable algorithm to obtain such a clustering already: $\phi$-expander decompositions have few intercluster edges and $\phi$-expanders have diameter $O(\log(n)/\phi)$ as you have shown in an exercise.
+\end{remark}
+
+However, for applications, the probabilistic guarantee is very useful and algorithms to find LDDs are generally much simpler than computing expander decompositions. LDDs have been used as a subroutine in many algorithms recently, we will see a truly exciting application of LDDs in the next chapter. In the first half of this lecture, we analyze a simple algorithm to obtain an LDD. In the second half of the lecture, we extend LDDs and our algorithm to directed graphs.
+
+\section{Low-Diameter Decomposition in Undirected Graphs}
+
+The main result of this half of the lecture is the following.
+
+\begin{theorem}\label{thm:computeLDDguarantees}
+Given an undirected graph $G = (V,E,\ww)$ with $\ww \in \mathbb{R}_{\geq 0}$, there is an algorithm $\textsc{ComputeLDD}(G, D)$ that computes an $(D,  8 \log(n))$-low-diameter-decomposition in time $O(m \log n)$ with probability at least $1-n^{-3}$. 
+\end{theorem}
+
+\paragraph{Exponential Distribution.} We denote by $\textsc{ExpDistr}(D)$ a function that samples a real according to the exponential distribution with parameter $D$.  Formally, we sample from a distribution with cumulative distribution function
+\[
+	F(x, D) = \begin{cases} 1 - e^{-x/D} & x \geq 0 \\ 0 & \text{otherwise} \end{cases}
+\]
+Note that we have the property that $F(D \cdot 4\log n,  D) = 1 - e^{-4\log n} = 1-1/n^4$.  A really cool property of the exponential distribution is further that it is memoryless which means that for any randomly sampled integer $X \sim \textsc{ExpDistr}(D)$ and fixed positive reals $x,s$, we have $P[X > x + s | X > s] = \mathbb{P}[X > x]$.
+
+\paragraph{A Simple LDD Algorithm.} Below, we present a simple algorithm to compute a low-diameter decomposition $\mathcal{X}$. The algorithm simply selects an arbitrary vertex $r$ in the graph, then chooses a random radius $\tilde{D}$ and adds the ball $B_{G}(r, \tilde{D})$ as a cluster to $\mathcal{X}$. The process is then repeated on the graph $G[V \setminus \mathcal{X}]$ (where we abuse notation and really mean $G[V \setminus (\cup_{X \in \mathcal{X}} X)]$), i.e. we repeat on the graph induced by all non-clustered vertices. Clearly, this outputs a partition of the vertex set $V$ in the end.
+
+\begin{algorithm}
+$\mathcal{X} = \{\}$.\\
+\While{$\mathcal{X}$ is not a full partition of $V$}{
+    Let $r$ be an arbitrary vertex in $V \setminus \mathcal{X}$.\\
+    $\tilde{D} \gets  \textsc{ExpDistr}(D)$.\\
+    $\mathcal{X} \gets \mathcal{X} \cup \{B_{G[V \setminus \mathcal{X}]}(r, \tilde{D})\}$.
+}
+\Return $(\mathcal{X}, E_{del} = \{ (u,v) \in E \;|\; u \in X \in \mathcal{X}, v \in Y \in \mathcal{X}, X \neq Y\})$
+\caption{$\textsc{ComputeLDD}(G, D)$}
+\label{alg:undirectedLDD}
+\end{algorithm}
+
+\paragraph{Analysis.} We now analyze the algorithm.
+
+\begin{claim}
+Given a clustering $\mathcal{X}$ returned by Algorithm \ref{alg:undirectedLDD}. We have with probability $\geq 1 - n^{-3}$, that for any $u,v \in X \in \mathcal{X}$, $\mathbf{dist}_{G[X]}(u,v) \leq 8 D \log(n)$. 
+\end{claim}
+\begin{proof}
+From our discussion of the exponential distribution, we have by a simple union bound over at most $n$ iterations of the algorithm, that none of the sampled radii $\tilde{D}$ exceeds $4 D \log(n)$ with probability $1 - n^{-3}$. Let us condition on this event. 
+
+Next, consider any iteration, where initially we have $\mathcal{X}$ and then we find a new vertex $r \in G[V \setminus \mathcal{X}]$ and a ball $X = B_{G[V \setminus \mathcal{X}]}(r, \tilde{D})$ that is added to $\mathcal{X}$ at the end of the iteration. We clearly have that $G[X]$ includes a path from each vertex $u \in X$ to $r$ of length at most $4 D \log(n)$. But then by the triangle inequality, for every pair $u,v \in X$, $\dist{G[X]}(u,v) \leq \mathbf{dist}_{G[X]}(u,r) + \mathbf{dist}_{G[X]}(r,v) \leq 8 D \log(n)$.
+\end{proof}
+
+\begin{claim}
+Given a clustering $\mathcal{X}$ returned by Algorithm \ref{alg:undirectedLDD}. $\forall e = (u,v) \in E$, $\mathbb{P}[e \in E_{del}] \leq w(e)/ D$. 
+\end{claim}
+\begin{proof}[Detailed Proof Sketch.]
+Consider the first iteration where either $u$ or $v$ is in a ball $B_{G[V \setminus \mathcal{X}]}(r, \tilde{D})$. By assumption, we have that in this iteration $\tilde{D} \geq \min_{x \in \{u,v\}} \mathbf{dist}_{G[V \setminus \mathcal{X}]}(r, x)$, i.e. we condition on the event $\mathcal{E}$ that $\tilde{D}$ satisfies this property. 
+
+Now, we have that $e$ becomes intercluster and thus is in $E_{del}$ if and only if one of the endpoints is not in the ball, i.e. that $\tilde{D} < \max_{x \in \{u,v\}} \mathbf{dist}_{G[V \setminus \mathcal{X}]}(r, x)$. We obtain the following inequalities 
+\begin{align*}
+\mathbb{P}&[e \text{ is an intercluster edge} \;|\; \mathcal{E}] \\
+    &= \mathbb{P}[\max_{x \in \{u,v\}} \mathbf{dist}_{G[V \setminus \mathcal{X}]}(r, x) \;|\; \mathcal{E}] \\
+    &\leq \mathbb{P}[\tilde{D} < \min_{x \in \{u,v\}} \mathbf{dist}_{G[V \setminus \mathcal{X}]}(r, x) + w(e)  \;|\; \tilde{D} \geq \min_{x \in \{u,v\}} \mathbf{dist}_{G[V \setminus \mathcal{X}]}(r, x)] \\
+    &= \mathbb{P}[\tilde{D} < w(e)] \\
+	&= F(w(e), D) - F(0, D) = (1 - e^{-w(e)/D}) - (1 - e^{0}) = 1 - e^{-w(e)/D} \\ &\leq 1 - (1 - w(e)/D) = w(e)/D.
+\end{align*}
+where we use the triangle inequality, that yields $\max_{x \in \{u,v\}} \mathbf{dist}_{G[V \setminus \mathcal{X}]}(r, x) \leq \min_{x \in \{u,v\}} \mathbf{dist}_{G[V \setminus \mathcal{X}]}(r, x) + w(e)$. Thus, the event that $ \tilde{D} < \min_{x \in \{u,v\}} \mathbf{dist}_{G[V \setminus \mathcal{X}]}(r, x) + w(e)$ contains the event that $e$ becomes intercluster, and it suffices to upper bound its probability. We then exploit the memoryless property, the definition of the exponential distribution, and then use $1+x \leq e^x$ to simplify.
+
+Note that we only analyzed the probability conditioned on $\mathcal{E}$. A more rigorous proof has to argue that in the event $\neg \mathcal{E}$, the probability of $e$ becoming intercluster is $0$. This requires some more careful set-up.
+\end{proof}
+
+It remains to bound the runtime to obtain \Cref{thm:computeLDDguarantees}. To this end, observe that every iteration can be executed running Dijkstra's algorithm from the vertex $r$ on the induced graph where vertices are only relaxed if their distance estimate drops below $\tilde{D}$. It is not hard to show that each iteration then takes time $O(|E(B_{G[V \setminus \mathcal{X}]}(r, \tilde{D}))| \log(n))$ and since these balls are vertex disjoint, we have that the total runtime is at most $O(m\log n)$, as desired.
+
+\section{Application of Undirected LDDs: Low-Stretch Trees and Approximate All-Pairs Shortest Paths}
+
+\paragraph{Low-Stretch (Spanning) Trees.} Let us start with the following definition.
+
+\begin{definition}
+Given an undirected graph $G=(V,E, \ww)$ with non-negative weights $\ww$. We say that a tree $T$ is an $\alpha$-low-stretch spanning tree ($\alpha$-LSST) if for every edge $e = (u,v)$, we have that $\mathbb{E}[\mathbf{dist}_T(u,v)] \leq \alpha \cdot \mathbf{dist}_G(u,v)$. 
+\end{definition}
+
+We can obtain an LSST using the following simple algorithm that simply computes an LDD, adds a shortest path tree for each cluster, and then contracts clusters and recurses.
+
+\begin{algorithm}
+$G' \gets G$; $T \gets (V , \emptyset)$.\\
+\While{$G'$ is not a single vertex}{
+    $\mathcal{X} \gets \textsc{ComputeLDD}(G, 2^{\sqrt{\log n}})$.\\
+    \ForEach{$X \in \mathcal{X}$}{
+        Let $r$ be an arbitrary vertex in $X$. \\
+        Add the shortest path tree from $r$ on $G[X]$ to $T$.
+    }
+    $G' \gets G' / \mathcal{X}$ \tcp*{ I.e. $G'$ becomes the graph $G'$ after contracting each cluster in $\mathcal{X}$ into a single vertex.}
+}
+\Return $T$.
+\caption{$\textsc{ComputeLSST}(G)$}
+\label{alg:computeLSST}
+\end{algorithm}
+
+In the upcoming graded homework, you will prove the following result.
+
+\begin{theorem}
+The algorithm \ref{alg:computeLSST} computes an $\alpha$-LSST in time $O(m \log^{3/2} n)$ with probability at least $1-n^{-2}$. 
+\end{theorem}
+
+\paragraph{Approximate All-Pairs Shortest-Paths.} Being able to obtain $\alpha$-LSST now gives us a simple algorithm to quickly obtain estimates for the all-pairs shortest paths problems. The distance estimates $\hat{d}(u,v)$ for each $u,v \in V$ will be $2\alpha$-approximate. Consider therefore Algorithm \ref{alg:approxAPSP}.
+
+\begin{algorithm}
+$\hat{d} \gets \infty \cdot \vecone^{V \times V}$.\\
+\For{$i = 1, 2, \ldots, 4 \log n$}{
+    $T \gets \textsc{ComputeLSST}(G)$.\\
+    \tcp{Take coordinate-wise min between previously observed distances and distance in $T$.}
+    $\hat{d} \gets \min \{\hat{d}, \{\mathbf{dist}_T(u,v)\}_{(u,v) \in V \times V}\}$.
+}
+\Return $\hat{d}$.
+\caption{$\textsc{ApproxAPSPDistances}(G)$}
+\label{alg:approxAPSP}
+\end{algorithm}
+
+It is now straight-forward using Markov's Inequality and a simple application of Chernoff's bounds to obtain that with probability at least $1- 1/n$, every distance estimate satisfies at the end that $\hat{d}(u,v) \leq 2\alpha \mathbf{dist}_G(u,v)$ for all $u,v \in V$. It is further not hard to obtain runtime $\tilde{O}(n^2)$ by using a dynamic programming technique or by using a link-cut data structure to perform distance queries on the tree in polylogarithmic amortized time.
+
+\section{Generalizing LDDs to Directed Graphs}
+
+For our most exciting application, we need to generalize LDDs to directed graphs.We will start out with a new definition, and then argue about why this is a reasonable generalization (other generalizations exist but this one allows to obtain LDDs efficiently and turns out very useful in applications).
+
+\begin{definition}
+Given a \textcolor{red}{directed graph} $G = (V,E,w)$ with non-negative weights $\ww \in \mathbb{R}_{\geq 0}$, we say that a partition $X_1, X_2, \ldots, X_k$ of $V$ and a set of edges $E_{del} \subseteq E$ form a $(D, \alpha)$-low-diameter decomposition of $G$ if
+\begin{enumerate}
+\item for every $i \in [1, k]$ and $u,v \in X_i$, we have $\mathbf{dist}_{\textcolor{red}{G}}(u,v) \leq \alpha D$, and
+\item $\forall e \in E$, $\mathbb{P}[e \in E_{del}] \leq \textcolor{red}{O(w(e) \log n/ D)}$.
+\item \textcolor{red}{the graph $(G / \{X_1, X_2, \ldots, X_k\}) \setminus E_{del}$, that is the graph where each cluster $X_i$ is contracted into a super-vertex, is a directed acyclic graph (DAG).}
+\end{enumerate}
+\end{definition}
+
+Note in particular the subtle difference in Property 1 that clusters have small distances in $G$ and not in the graph induced by the cluster. In Property 2, we gave the probability an $O(\log n)$ slack. While this makes the definition slightly unclean, it makes it easier to state our result.
+
+The third property might initially look a bit strange. Let us briefly argue that it is a reasonable property to have. Note first, that in directed graphs, we might have a highly asymmetric relationship in distances, i.e. $\mathbf{dist}_G(u,v) \ggg \mathbf{dist}_G(v,u)$ for some, or even all the vertices. One example that really stresses this is the cycle graph. While it is very easy to decompose the undirected cycle graph, the directed cycle graph only allows for decomposition into singletons if one insists on having clusters of small diameter $D$. What the third property expresses is that in this case, while our clusters are not very meaningful, we learn something about the structure of $G$: removing a few edges (in this case a single one) makes the directed graph acyclic. 
+
+In the next lecture, we will see an application of this subroutine in an algorithm that basically does a case split for these two extreme cases: it exploits the small distances in clusters to make progress on the clusters, and it exploits the structural closeness to a DAG on the remainder of the graph.
+
+The rest of this lecture is concerned with proving the following theorem.
+
+\begin{theorem}\label{thm:computeDirLDDguarantees}
+Given a \textcolor{red}{directed} graph $G = (V,E,\ww)$ with $\ww \in \mathbb{R}_{\geq 0}$, there is an algorithm $\textsc{ComputeDirectedLDD}(G, D)$ that computes an $(D, 8 \log(n))$-low-diameter-decomposition in time $\tilde{O}(m)$ with probability at least $1-n^{-3}$. 
+\end{theorem}
+
+Let us show how to implement the algorithm. Again, we are simply carving out balls, one after another, until we know that all remaining distances have small distance to each other. An important detail in this algorithm is that while the ball-carving is executed on the graph $G[V \setminus \mathcal{X}]$, which is the graph with all carved out vertices removed, the eligibility criterion of the while-loop is with respect to the initial input graph $G$. We also point out that $|V(G)|$ here might be different from $n$, as $n$ denotes the size of the global input graph, while $|V(G)|$ denotes the size of the input graph to the current procedure. This is important for recursive calls.
+
+\begin{algorithm}
+$\mathcal{X} = \{\}$;  $E_{del} \gets \emptyset$.\\
+\While{there is a vertex $r \in V \setminus \mathcal{X}$ with $|B^{out}_{G[V \setminus \mathcal{X}]}(r, 4D \log n)| \leq \frac{1}{2}|V(G)|$ \textbf{ or } $|B^{in}_{G[V \setminus \mathcal{X}]}(r, 4D \log n)| \leq \frac{1}{2} |V(G)|$}{
+    $\# \gets argmin_{\# \in \{out, in\}} |B^{\#}_{G[V \setminus \mathcal{X}]}(r, \tilde{D})|$.\\
+    $X \gets B^{\#}_{G[V \setminus \mathcal{X}]}(r, \tilde{D})$.\\
+    Add all $\#$-edges of $X$ in $G[V \setminus \mathcal{X}]$ to $E_{del}$.\\
+
+    $(\mathcal{X}', E_{del}') \gets  \textsc{ComputeLDD}(G[X], D)$\label{lne:recursiveCall}\tcp*{Recurse.}
+    $\mathcal{X} \gets \mathcal{X} \cup \{X\} \cup \mathcal{X}'$; $E_{del} \gets E_{del} \cup E'_{del}$.\\
+}
+$\mathcal{X} \gets \mathcal{X} \cup \{ V \setminus \mathcal{X}\}$\label{lne:addCluster} \tcp*{Add new cluster.}
+\Return $(\mathcal{X}, E_{del})$
+\caption{$\textsc{ComputeDirectedLDD}(G, D)$}
+\label{alg:directedLDD}
+\end{algorithm}
+
+\paragraph{Analysis.} In the interest of time, we only sketch the analysis. A rigorous exposition of these arguments can be found at here\footnote{Lecture Notes by Danupon Nanongkai: \url{https://hackmd.io/@U0nm1XUhREKPYLt1eUmE6g/Sycpovkiq}.}.
+
+\begin{claim}
+Given a clustering $\mathcal{X}$ returned by Algorithm \ref{alg:directedLDD}. We have for any $u,v \in X \in \mathcal{X}$, $\mathbf{dist}_{G}(u,v) \leq 8 D \log(n)$. 
+\end{claim}
+\begin{proof}
+Note that a new cluster is only added to $\mathcal{X}$ in Line \ref{lne:addCluster} (all other clusters stem from recursive calls that themselves find clusters by adding them in this line). Consider any two vertices $u,v$ in this new cluster, we have that $u$ reaches more than half the vertices in $G$ in its out-ball of radius $4D \log n$ and $v$ reaches more than half the vertices of $G$ in its in-ball of the same radius. Thus, these balls have an intersection and there is a path of weight at most $8D \log n$. 
+\end{proof}
+
+\begin{claim}
+Given a clustering $\mathcal{X}$ returned by Algorithm \ref{alg:undirectedLDD}. $\forall e = (u,v) \in E$, $\mathbb{P}[e \in E_{del}] = O(w(e) \log n / D)$.
+\end{claim}
+\begin{proof}[Proof Sketch.]
+It is not hard to see that  Algorithm \ref{alg:undirectedLDD} only calls itself recursively on disjoint vertex subsets of at most half the size of the original graph (technically, this is only true when conditioned on $\tilde{D}$ never exceeding $4D \log n$, but we will be imprecise here). It is therefore straightforward to see that each vertex $u$ participates in at most $O(\log n)$ calls. 
+
+The remainder of the analysis is analogous to the undirected case. Here, we exploit that an out-ball only adds the boundary edges leaving the out-ball to $E_{rem}$ and an in-ball only the boundary edges entering the in-ball. 
+\end{proof}
+
+This completes the proof of correctness, we omit a proof of the third property as it is simple but tedious.
+
+Finally, we want to argue about runtime. Here, the bottleneck of the algorithm is the computation of the information in the while-loop condition. We will weaken this condition slightly to obtain an efficient algorithm: we initially sample a set $S$ consisting of $\Theta(\log n)$ vertices uniformly at random. We then run Dijkstra from each vertex in $S$ on the graph $G$ and the reverse graph. This allows us to obtain for each vertex $v \in V$, the information how large the intersection of $S$ is with its out- and in-ball of radius $4D\log n$. This now gives an estimator that w.h.p. can detect whether a vertex $v$ has an out- and in-ball of size more than $|V(G)|/2$ or otherwise guarantees that both balls are of size at most $\frac{3}{4}|V(G)|$. Using this criterion in place of the while-loop condition then gives the same asymptotic bounds.
+
+Given estimators, it is not hard to bound the total runtime by $\tilde{O}(m)$. We leave it to the reader to verify this bound.
