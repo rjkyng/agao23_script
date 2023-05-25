@@ -1,0 +1,167 @@
+\chapter{Negative Single-Source Shortest Paths}
+
+In this lecture, we are interested in the following result. It says that even in graphs with negative edge weights, we can find the single-source shortest paths in near-linear time! This result has been obtained extremely recently and the algorithm is a beautiful combination of some of the most useful modern graph algorithmic techniques.
+
+\begin{theorem}\label{thm:negativeSSSPBNW}
+Given a directed graph $G=(V,E, \ww)$ with $\ww \in \mathbb{R}^V$ such that there exists no negative cycle in $G$,  and a dedicated source vertex $s \in V$, the distances $\mathbf{dist}_G(s,t)$ can be computed in time $\tilde{O}(m \log(W))$ where  $W = \max_{e \in E} |w(e)|$, i.e. $W$ is the largest absolute weight.
+\end{theorem}
+
+Since the precise combination of the underlying tools is still a bit involved,  the lecture will mainly focus on  the special case where $G$ is undirected and all weights are either $+1$ or $-1$, i.e. $\ww \in \{+1,-1\}^V$.  We will also obtain a worse runtime.  The result that we will formally prove is stated below.
+
+\begin{theorem}
+Given an undirected graph $G=(V,E, \ww)$ with $\ww \in \{-1, 1\}$ such that there exists no negative cycle in $G$,  and a dedicated source vertex $s \in V$, the distances $\mathbf{dist}_G(s,t)$ can be computed in time $\tilde{O}(m^{3/2})$.
+\end{theorem}
+
+In the end of the lecture, we will the review the techniques and sketch how to refine them to obtain the more general theorem \Cref{thm:negativeSSSPBNW}.  However, for a rigorous proof, we have to refer you to the article. 
+
+
+\section{A Brief Recap: Classic Algorithms for Handling Negative Weights}
+
+\paragraph{Classic Bellman-Ford.} The classic algorithm that should come to mind when computing single-source shortest paths with negative weights is Bellman-Ford's algorithm. The algorithm works by initializing distance estimates $\hat{d}(s, u)$ with infinity and $\hat{d}(s,s)$ with $0$. It then proceeds for $n$ rounds by relaxing the edge set in every round. 
+
+\begin{algorithm}
+$\forall u \in V \setminus \{s\}, \hat{d}(s, u) \gets \infty$; $\hat{d}(s,s) \gets 0$.\\
+\For{$i = 1, 2, \ldots, n$}{
+	\ForEach{$e = (u,v) \in E$}{
+		$\hat{d}(s, v) \gets \min\{\hat{d}(s, v) ,  \hat{d}(s, u) + w(e)\}$
+	}
+}
+\Return $\{\hat{d}(s, v) \}_v$
+\caption{$\textsc{BellmanFord}(G,s)$}
+\label{alg:bellmanFord}
+\end{algorithm}
+
+The following theorem summarizes the guarantees of the algorithm.
+
+\begin{theorem}
+Algorithm \ref{alg:bellmanFord} takes as input a directed, weighted graph $G=(V,E, \ww)$ where weights are allowed to be negative, but that contains no negative cycle; and a source vertex $s \in V$. It runs in time $O(mn)$ and outputs the correct distances from $s$ to every vertex $v \in V$. 
+\end{theorem}
+\begin{proof}
+The algorithm runs for $n$ iterations and relaxes $m$ edges in each iteration, each in $O(1)$ time. This establishes the runtime.
+
+We prove correctness by induction. We prove that after the $h$-th iteration of the algorithm, for all vertices $v$ that have a shortest path consisting of at most $h$ edges have $\hat{d}(s,v)$ is equal to the real $s$ to $v$ distance.
+
+The base case $h = 0$ is trivial because $\hat{d}(s,s)$ is initialized to $0$. For the inductive step $h \mapsto h+1$, we use the subpath property of shortest paths, that is, for any $v$ that has an shortest $s$ to $v$ shortest path consisting of exactly $h+1$ edges, we have that for the vertex $u$ preceding $v$ on this path, we have that the subpath from $s$ to $u$ is a shortest path itself and has clearly $<h+1$ edges (it is easy to establish the subpath property via a proof by contradiction). Thus in the $h+1$-th iteration, when the edge $e = (u,v)$ is relaxed, we have $\hat{d}(s, v) \gets \hat{d}(s, u) + w(e)= \mathbf{dist}_G(s,u) + w(e) = \mathbf{dist}_G(s,v)$.
+\end{proof}
+
+\paragraph{A Heuristic for Speeding-Up Bellman-Ford.} If you think a bit longer about Bellman-Ford and why you cannot use Dijkstra, you might actually stumble upon the following idea that might improve runtime in practice: consider that there is a shortest path from $s$ to $v$ that consists of at most $h$ negative edges. Then, we could try to relax negative edges by Bellman-Ford, and relax all non-negative edges between two consecutive edges on the shortest path by using Dijlstra's algorithm.  
+
+Let us make that intuition precise.
+
+\begin{definition}
+Given a directed, weighted graph $G=(V,E,\ww)$ with negative weights but no negative cycle and a dedicated source $s \in V$. For any vertex $v \in V$, we let $\eta(v)$ be the minimum number of negative edges on any shortest $s$ to $v$ path. We define $\eta(G) = \min_v \eta(v)$. 
+\end{definition}
+
+The pseudo-code below now formalizes our intuitive approach. It reduces the number of iterations from $n$ to $\eta(G)$ which is always upper bounded by $n$ (in a graph without negative cycles). Note that $\eta(G)$ can also be computed efficiently since one can stop the algorithm simply after a round where no distance estimate was improved which is exactly after the $(\eta(G) +1)$-th iteration. 
+
+\begin{algorithm}
+$\forall u \in V \setminus \{s\}, \hat{d}(s, u) \gets \infty$; $\hat{d}(s,s) \gets 0$.\\
+\For{$i = 1, 2, \ldots, \eta(G)$}{
+	\tcc{Relaxation via Bellman-Ford.}
+	\ForEach{$e = (u,v) \in E$}{
+		$\hat{d}(s, v) \gets\min\{\hat{d}(s, v) ,  \hat{d}(s, u) + w(e)\}$.
+	}
+
+	\tcc{Relaxation via Dijkstra's Algorithm.}	
+	$Q \gets V$.\\
+	\While{$Q \neq \emptyset$}{
+		Let $u$ be the vertex in $Q$ that has smallest $ \hat{d}(s, u)$.\\ 
+		\ForEach{$e = (u,v) \in E, w(e) \geq 0$}{
+			$\hat{d}(s, v) \gets \min\{\hat{d}(s, v) ,  \hat{d}(s, u) + w(e)\}$.
+		}
+	}
+}
+\Return $\{\hat{d}(s, v) \}_v$
+\caption{$\textsc{BellmanFord}(G,s)$}
+\label{alg:embellishedBellmanFord}
+\end{algorithm}
+
+We can now prove the following theorem which prove that the algorithm above is faster at least for the special case when $\eta(G)$ is much smaller than $n$.
+
+\begin{theorem}
+Algorithm \ref{alg:embellishedBellmanFord} runs in time $O((\eta(G) + 1) m \log(n))$ time and outputs the correct $s$ to $v$ distances.
+\end{theorem}
+\begin{proof}[Proof Sketch]
+The runtime is clear.  For correctness, let us assume that all outgoing edges from $s$ are negative (this is w.l.o.g. since we can add a dummy-source $s'$ and add an edge of weight $-1$ from $(s', s)$. The distances from $s'$ are then the distance from $s$ offset by additive $-1$).  
+
+Then correctness follows by induction on $\eta(v)$, i.e. after the $h$-th round of the algorithm, we have for all vertices $v \in V$ with $\eta(v) \leq h$, that $\hat{d}(s,v) = \mathbf{dist}_G(s,v)$. The base case is again trivial. For the inductive step $h \mapsto h+1$, we have that for any $v$ with $\eta(v) = h+1$, by the subpath property, we have that the vertex $u$ just before the last negative edge on the shortest $s$ to $v$ path of $h+1$ edges, that $\hat{d}(u)$ is equal to the real distance after round $h$. But in round $h+1$, the outgoing negative edges of $u$ are relaxed in the Bellman-Ford relaxation and thus the first vertex after the negative edge is assigned its correct distance. And then after running our version of Dijkstra, every non-positive edge is relaxed in the correct order.
+\end{proof}
+
+\paragraph{All-Pairs Shortest Paths in Negative-Weight Graphs via Price Function.} While we are at reviewing classic algorithms, let us also briefly review Johnson's algorithms.
+
+\begin{definition}[Price Function]
+For any vector $\mathbf{\phi} \in \mathbb{R}$, we say $\phi$ is a \emph{price function} if $\ww_{\mathbf{\phi}} = \ww + \BB^{\trp} \mathbf{\phi} > \veczero$, i.e. where for each edge $e = (u,v) \in E$ oriented from $u$ to $v$, we have that $\ww(e) + \phi(u) - \phi(v) > 0$.
+\end{definition}
+
+
+
+\section{A Universal Tool: Low-Diameter Decompositions (LDDs)}
+
+\begin{definition}
+Given an undirected graph $G = (V,E,w)$ with non-negative weights $\ww \in \mathbb{R}_{\geq 0}$, we say that a partition $X_1, X_2, \ldots, X_k$ of $V$ is a $(D, \alpha)$-low-diameter decomposition of $G$ if
+\begin{enumerate}
+\item  for every $i \in [1, k]$ and $u,v \in X_i$, we have $\mathbf{dist}_{G[X_i]}(u,v) \leq \alpha D$. 
+\item $\forall e \in E$, $\mathbb{P}[e \text{ is an intercluster edge}] = 2w(e)/ D$ where we say an edge $e$ is an intercluster edge if its endpoints are in different clusters $X_i, X_j$. 
+\end{enumerate}
+\end{definition}
+\begin{remark}
+Often instead of second property, LDDs are often defined to have a small fraction of the edges (or more precisely their weight) in between clusters. For unweighed graphs, the best one can hope for is essentially at most $m/D$ intercluster edges in total.  The above definition allows to obtain this property in expectation. Defined this way, we also have already seen a reasonable algorithm to obtain such a clustering: $\phi$-expander decompositions have few intercluster edges and $\phi$-expanders have diameter $O(\log(n)/\phi)$ as you have shown in an exercise.
+\end{remark}
+
+However, we will crucially exploit the randomness that is baked into our definiton. We obtain the following result.
+
+\begin{theorem}
+Given an undirected graph $G = (V,E,\ww)$ with$\ww \in \mathbb{R}_{\geq 0}$, there is an algorithm that computes an $(D,  8 \log(n))$-low-diameter-decomposition in time $O(m \log n)$ with high probability. 
+\end{theorem}
+
+\paragraph{Exponential Distribution (Recap).} We denote by $\textsc{ExpDistr}(D)$ a function that samples a real according to the exponential distribution with parameter $D$.  Formally, we sample from a distribution with cumulative distribution function
+\[
+	F(x, D) = \begin{cases} 1 - e^{-x/D} & x \geq 0 \\ 0 & \text{otherwise} \end{cases}
+\]
+Note that we have the property that $F(D \cdot 4\log n,  D) = 1 - e^{4\log n} = 1-1/n^4$.  A really cool property of the exponential distribution is further that it is memoryless which means that for any randomly sampled integer $X \sim \textsc{ExpDistr}(D)$ and fixed positive reals $x,s$, we have $P[X > x + s | X > s] = \mathbb{P}[X > x]$.
+
+\paragraph{A Simple LDD Algorithm.} We now present an extremely simple algorithm to compute an LDD.  See below for the pseudo-code.  Henceforth, we define $\Delta(v, x) = dist_G(x, v) + D_{max} - \dd(x)$ and we assume that each minimum $\min_{x \in V} \Delta(v,x)$ is achieved by a unique minimizer which is wlog since each point is sampled by the exponential distribution w.p. $0$ so this assumption holds with probability $1$.
+
+\begin{algorithm}
+Sample $\dd \in \mathbb{R}^n$ coordinate-wise from $\textsc{ExpDistr}(D)$.\\
+\lIf{$\|\dd\|_{\infty} > D_{max} = 4D \log(n)$}{\Return \textbf{FAIL}.} 
+\ForEach{$v \in V$}{
+	$x_v \gets \argmin_{x \in V} dist_G(x, v) + D_{max} - \dd(v)$. \tcp{Assign center vertex.}
+}
+\Return $X_1, X_2, \ldots, X_k$ taken to be the clusters of vertices with the same center.
+\caption{$\textsc{ComputeLDD}(G, D)$}
+\label{alg:LDD}
+\end{algorithm}
+
+By our previous calculation, we know that the probability of failure of our algorithm is at most $1-1/n^3$ (by a simple union bound over $n$ events).  To implement the algorithm observe that by the if-condition, we have that $D_{max} - \dd(v)$ is positive for all vertices $v \in V$.  One can therefore add a dummy source $d$ to the graph $G$ with an edge $(d,v)$ for each vertex $v \in V$ of weight $D_{max} - \dd(v)$. It is not hard to see that running Dijkstra's algorithm from the dummy source $d$ allows us to extract the correct distances and using the shortest path tree that can be computed with Dijkstra's algorithm, the clusters can also be computed efficiently.  The run-time of the algorithm is then dominated by Dijkstra's algorithm and therefore $O(m \log n)$. 
+
+It only remains to establish correctness for the case where the algorithm returns a partition.
+
+\begin{lemma}
+If \Cref{alg:LDD} returns a partition $X_1, X_2, \ldots, X_k$, then this partition forms an $(D,  8 \log(n))$-LDD.
+\end{lemma}
+\begin{proof}
+\underline{$\forall u,v \in X_i$ for any $i$, $\mathbf{dist}_{G[X_i]}(u,v) \leq 2 D_{max}$:}
+Note that for every vertex $x \in X_i$ there is an edge $(d,x)$ of weight at most $D_{max}$. Since the distance in $T$ from $d$ to all the vertices in $G'$ is the same as in $G'$, we have that the tree path $T[d,x] \leq D_{max}$. Finally, note that a cluster $X_i$ is a subtree of $T$ rooted at a vertex $r$ that is a child of $d$. But this implies that for $u$ and $v$, we have that the path $T[u, x] \cup T[x,v]$ is of length at most $2D_{max}$ and that it is contained in $G[X_i]$. 
+
+\underline{$\forall e \in E$, $\mathbb{P}[e \text{ is an intercluster edge}] = w(e)/ D$:} For $e = (u,v)$, let $x_u \argmin_{x \in V} \Delta(u, x)$ and $\hat{x}_u =  \argmin_{x \in V \setminus \{x_u \}} \Delta(u, x)$. That is let $x_u$ be the center of $u$ and let $\hat{x}_u$ be the second best minimizer. 
+
+The idea of the proof is that if the cluster centers of $u$ and $v$ then we also must have that $\Delta(u, \hat{x}_u) < \Delta(u, x_u) + 2 w(e)$. This follows since the cluster center of $v$, denoted by $x_v$, is the minimizer of $\Delta(v, x_v)$ over all vertices. Thus $\Delta(v, x_v) < \Delta(v, x_u)$. Using that $dist_G(u,v) \leq w(e)$, we have that 
+\begin{align*}
+& \Delta(v, x_v) < \Delta(v, x_u)\\
+\iff &dist_G(x_v , v) + D_{max} - \dd(x_v) < dist_G(x_u , v) + D_{max} - \dd(x_u) \\
+\implies &dist_G(x_v , u) - w(e)+ D_{max}  - \dd(x_v) < dist_G(x_u , u) + w(e) + D_{max} - \dd(x_u)\\
+\iff & \Delta(u,x_v)  < \Delta(u, x_u) + 2w(e).
+\end{align*}
+And since $\hat{x}_u$ minimizes over all vertices (except $x_u$ where we assume $x_v \neq x_u$), we have $\Delta(v, \hat{x}_u) \leq \Delta(v, x_v)$. 
+
+We have in turn that $\Delta(u, \hat{x}_u) < \Delta(u, x_u) + 2 w(e)$ if and only if $- \dd(\hat{x}_u) < - \dd(x_u) +  2w(e)$ if and only if $\dd(\hat{x}_u) + 2w(e) > \dd(x_u)$.   We can now analyze the probability of this event where we condition on the event that $\dd(\hat{x}_u) > \dd(x_u)$ which we have from our set-up of $\hat{x}_u$ being the second best minimizer for $u$. We thus get  
+\begin{align*}
+	\mathbb{P}&[\Delta(u, \hat{x}_u) < \Delta(u, x_u) + 2 w(e) \;|\; \Delta(u, \hat{x}_u) < \Delta(u, x_u)] \\
+	&= \mathbb{P}[ \textsc{ExpDistr}(D) > 2w(e)] \\
+	&= F(1, D) - F(0, D) = (1 - e^{-2w(e)/D}) - (1 - e^{0}) = 1 - e^{-2w(e)/D} \\ &\leq 1 - (1 - 2w(e)/D) = 2w(e)/D.
+\end{align*}
+where we used the memoryless property of the exponential distribution in the first equality, and then only need to use $1 + x \leq e^x$. 
+\end{proof}
+
+\section{An Algorithm for Negative-Weight Shortest Paths}
