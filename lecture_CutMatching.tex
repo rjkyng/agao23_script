@@ -38,7 +38,7 @@ Let us start by exploring the first key idea behind the algorithm. We therefore 
     \centering
     \includegraphics[scale=0.2]{./fig/embedGraph_lectureCutMatching.jpeg}
     \caption{In this example the red edge $(u,v)$ in $H$ is mapped to the red $u$-to-$v$ path in $G$.}
-    \label{fig:my_label}
+    %\label{fig:my_label}
 \end{figure}
 
 We say that the \emph{congestion} of $\textsc{Embed}_{H \xrightarrow{} G}$ is the maximum number of times that any edge $e \in E(G)$ appears on any embedding path: \[
@@ -80,7 +80,7 @@ Although there are still some missing pieces, let us next discuss the algorithm 
     \centering
     \includegraphics[scale=0.2]{./fig/AlgorithmProcessing_lectureCutMatching.jpeg}
     \caption{Illustration of the steps of the Algorithm. In a), a bi-partition of $V$ is found. In b), the bi-partition is used to obtain a flow problem where we inject one unit of flow to each vertex in $S$ via super-source $s$ and extract one unit via super-sink $t$. c) A path flow decomposition. For each path, the first vertex is in $S$ and the last vertex in $\overline{S}$. d) We find $M_i$ to be the one-to-one matching between endpoints in $S$ and $\overline{S}$ defined by the path flows.}
-    \label{fig:my_label}
+    %\label{fig:my_label}
 \end{figure}
 
 \paragraph{Beginning of an Iteration.} In each iteration of the algorithm, we first invoke a sub-procedure $\textsc{FindBiPartition}(\cdot)$ that returns a cut $(S,\overline{S})$ (where $\overline{S} = V \setminus S$) that partitions the vertex set into two equal-sized sides. Here, we implicitly assume that the number of vertices $n$ is even which is w.l.o.g. 
@@ -109,7 +109,7 @@ Let $n_s$ be the number of edges incident to the super-source $s$ that cross the
     \centering
     \includegraphics[scale=0.2]{./fig/FewEdgesCrossCut_lectureCutMatching.jpeg}
     \caption{Set $X_S$ is enclosed by the orange circle. The thick orange edges are in the cut and incident to super-source $s$. Thus they count towards $n_s$. Here $n_s = 2, n_t = 0$. Note that all remaining edges in the cut are black, i.e. were originally in $G$ and therefore have capacity $1/\psi$.}
-    \label{fig:my_label}
+    %\label{fig:my_label}
 \end{figure}
 
 Observe that after taking away the vertices $s$ and $t$, the cut $(X_S \setminus \{s\}, X_{\overline{S}} \setminus \{t\})$ has less than $n/2 - n_s - n_t$ capacity. But each remaining edge has capacity $1/\psi$, so the total number of edges in the cut can be at most $\psi \cdot (n/2 - n_s - n_t)$. Since $X_S \setminus \{s\}$ is of size at least $n/2-n_s$, and $X_{\overline{S}} \setminus \{t\}$ is of size at least $n/2-n_t$, we have that the induced cut in $G$ has
@@ -142,7 +142,7 @@ Consider any cut $(S, \overline{S})$ with $|S| \leq |\overline{S}|$. It is conve
     \centering
     \includegraphics[scale=0.15]{./fig/MixingWalkIsExpander_lectureCutMatching.jpeg}
     \caption{Each vertex $j \in \overline{S}$ sends at least $1/(2n)$ probability mass to $i$ (red arrow). But in order to transport it, it does have to push the mass through edges in the matchings $M_1, M_2, \dots, M_t$ that cross the cut.}
-    \label{fig:my_label}
+    %\label{fig:my_label}
 \end{figure}
 
 Clearly, to move the mass from $\overline{S}$ to $S$ it has to use the matching edges that also cross the cut.

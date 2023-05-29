@@ -14,7 +14,7 @@ In this lecture, we restrict ourselves to \emph{dynamic rooted forests} that is 
     \centering
     \includegraphics[scale=0.2]{./fig/InsertionDynamicTree_lectureDynamicTree.jpeg}
     \caption{The $i^{th}$ version of $G$ is a rooted forest. Here, red vertices are roots and there are two trees. The $(i+1)^{th}$ version of $G$ differs from $G^i$ by a single edge that was inserted (the blue edge). Note that edge insertions are only valid if the tail of the edge was a root. In the right picture, the former root on the right side is turned into a normal node in the tree by the update.}
-    \label{fig:my_label}
+    %\label{fig:my_label}
 \end{figure}
 
 \paragraph{The Interface.} Let us now describe the interface of our data structure that we call a link-cut tree. We want to support the following operations:
@@ -287,7 +287,7 @@ We can now speed-up this procedure by storing the DFS-tree explicitly as a dynam
     \centering
     \includegraphics[scale=0.2]{./fig/TransformToVertCaps_lectureDynamicTree.jpeg}
     \caption{Each edge $(u,v)$ with capacity $c(u,v)$ is split into two edges $(u,m)$ and $(m,v)$. The capacity is then on the vertex $m$.}
-    \label{fig:my_label}
+    %\label{fig:my_label}
 \end{figure}
 
 Finally, we give the new pseudo-code for the blocking flow procedure below.

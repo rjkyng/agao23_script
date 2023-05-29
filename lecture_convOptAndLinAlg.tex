@@ -227,10 +227,10 @@ when $\yy$ is ``close to'' $\xx$ in some sense.
  \begin{figure}[h]
   \centering
   \includegraphics[width=0.4\textwidth]{fig/lecture2_taylor-1st-order-remainder.png}
-\caption{The convex function $f(\yy)$ sits above the linear function
-  in $\yy$ given by
-  ${f(\xx) + \grad f(\xx)^\trp  (\yy-\xx)}$.}
-\label{fig:nonjointconvex}
+  \caption{The function $f(\yy)$  equals its linear approximation
+    based at $x$, with gradient coming from an intermediate point $z$, i.e.
+    $f(\yy) = f(\xx) + \grad f(\zz)^\trp (\yy-\xx).$}
+\label{fig:taylorremainder}
 \end{figure}
 % LATEXIT NOTES
 % f(\boldsymbol{x}) + \mathbf{\nabla} f(\boldsymbol{x})^{\top} (\boldsymbol{y}-\boldsymbol{x})
@@ -284,7 +284,7 @@ differentiable convex function can be lower bounded by an affine function.
 \caption{The convex function $f(\yy)$ sits above the linear function
   in $\yy$ given by
   ${f(\xx) + \grad f(\xx)^\trp  (\yy-\xx)}$.}
-\label{fig:nonjointconvex}
+\label{fig:convexlinearlb}
 \end{figure}
 % LATEXIT NOTES
 % f(\boldsymbol{x}) + \mathbf{\nabla} f(\boldsymbol{x})^{\top} (\boldsymbol{y}-\boldsymbol{x})

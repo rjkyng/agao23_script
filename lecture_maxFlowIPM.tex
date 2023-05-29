@@ -28,7 +28,7 @@ available to ETH students for download through the ETH IT Shop.
 \section{An Interior Point Method}
 \paragraph{The Maximum Flow problem in undirected graphs.}
  \begin{align}
-   \label{eq:maxflow}
+   \label{eq:maxflowagain}
 \max_{\ff \in \R^E}  & \quad F    \\
    \textrm{s.t. }  \BB\ff= F \bb_{st}
      \tag*{``The Undirected Maximum Flow Problem''}
@@ -52,7 +52,7 @@ because of this, we can use a binary search to approximate $F^*$.
 V(\ff) = \sum_e -\log(\cc(e)-\ff(e))  -\log(\cc(e)+\ff(e)) 
 \]
 
-We assume the optimal value of Program~\eqref{eq:maxflow} is $F^*$.
+We assume the optimal value of Program~\eqref{eq:maxflowagain} is $F^*$.
 Then for a given $0 \leq \alpha < 1$ we define a program
 \begin{align}
    \label{eq:barrierflow}
@@ -73,7 +73,7 @@ strictly below $\infty$, and hence in
 turn strictly satisfy the capacity constraints.
 Thus, if we can find the optimal flow for Program
 \eqref{eq:barrierflow} for $\alpha = 1-\epsilon$, we will have a
-feasible flow with Program~\eqref{eq:maxflow}, the Undirected Maximum Flow Problem, routing
+feasible flow with Program~\eqref{eq:maxflowagain}, the Undirected Maximum Flow Problem, routing
 $(1-\epsilon)F^*$.
 This is how we will develop an algorithm for computing the maximum flow.
 
@@ -283,7 +283,7 @@ The key insight in this type of interior point method is that when the
 update $\alpha'$ is small enough, 
 \begin{theorem}\label{thm:maxflowipm}
   Algorithm~\ref{alg:ipm} returns a flow $\ff$ that is feasible for
-  Problem~\eqref{eq:maxflow} in time $\Otil(m^{1.5}\log(1/\epsilon))$.
+  Problem~\eqref{eq:maxflowagain} in time $\Otil(m^{1.5}\log(1/\epsilon))$.
 \end{theorem}
 
 \begin{proof}[Proof Sketch]

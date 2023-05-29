@@ -343,7 +343,7 @@ state in the so-called remainder form.
 
 Recall that in the previous chapter, we show the following proposition.
 \begin{proposition}
-\label{prp:gradatmin}
+\label{prp:gradatminagain}
     If $\xx$ is a local extremum of a differentiable function
     $f:S\rightarrow \R$
     then $\grad f(\xx) = \veczero$.
@@ -360,7 +360,7 @@ Let $f:S \rightarrow\R$ be a function twice differentiable at
 \end{theorem}
 \begin{proof}
   Let us assume that $\xx$ is a local minimum. We know from
-    Proposition~\ref{prp:gradatmin} that $\grad f(\xx)= \veczero$, hence the second-order expansion at $\xx$ takes the form:
+    Proposition~\ref{prp:gradatminagain} that $\grad f(\xx)= \veczero$, hence the second-order expansion at $\xx$ takes the form:
     \begin{displaymath}
         f(\xx + \lambda\dd) = f(\xx) + \lambda^2 \frac{1}{2} \dd^\trp
         \HH_f(\xx)\dd + o(\lambda^2 \norm{\dd}_2^2)
@@ -702,7 +702,7 @@ progress.
 But how much can they differ? We will now try to show a limit on this.
 
 Recall that in the previous chapter we showed the following theorem.
-\begin{theorem}\label{thm:convexlb}
+\begin{theorem}\label{thm:convexlbagain}
 Let  $S$ be an open convex subset of $\mathbb{R}^n$, and
 let $f:S\to \mathbb{R}$ be a differentiable function.
 Then, $f$ is convex if and only if for any $\xx,\yy \in S$ we have that $f(\yy) \geq f(\xx) + \grad f(\xx)^\trp  (\yy-\xx)$.
@@ -710,7 +710,7 @@ Then, $f$ is convex if and only if for any $\xx,\yy \in S$ we have that $f(\yy) 
 
 
 Using the convexity of $f$ and the lower bound on
-convex functions given by Theorem~\ref{thm:convexlb}, we have that
+convex functions given by Theorem~\ref{thm:convexlbagain}, we have that
 \begin{align}
 \label{eq:basiciterlb}
 f(\xx^*) \geq f(\xx_i) + \grad f(\xx_{i})^\trp (\xx^* - \xx_i)
@@ -1013,7 +1013,7 @@ Carrying out this induction is one of the exercises in problem set 2.
 %  &-
 %     A_{i}
 %    \ip{\grad f(\xx_{i+1}), \yy_{i} - \xx_{i+1}  }
-%    \tag*{Second term bounded by Theorem~\ref{thm:convexlb}.}
+%    \tag*{Second term bounded by Theorem~\ref{thm:convexlbagain}.}
 %  \\
 %   &+ a_{i+1} f(\xx_{i+1})
 %     \tag*{Third term uses $a_{i+1} = A_{i+1}-A_{i}$.}

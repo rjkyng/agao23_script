@@ -278,7 +278,7 @@ W & -\aa^\trp \\
 \veczero & \diag(\aa) - \frac{1}{W} \aa \aa^\trp
 \end{array} \right)
 \]
-which is illustrated in Figure \ref{fig:schurclique}.
+which is illustrated in Figure \ref{fig:schurcliqueagain}.
 %
 \begin{figure}[H]
   \centering
@@ -287,7 +287,7 @@ which is illustrated in Figure \ref{fig:schurclique}.
   \caption{Gaussian Elimination:
     $\vcliq{1}{\LL} = \vstar{1}{\LL} - \frac{1}{\LL(1,1)} \LL(:,1)
     \LL(:,1)^{\trp}$.}
-      \label{fig:schurclique}
+      \label{fig:schurcliqueagain}
     \end{figure}
 In Chapter~\ref{cha:ge}, we proved that $\vcliq{v}{\SS}$ is a graph Laplacian --
 it follows from the proof of Claim~\ref{clm:optimgaussclosed} in that chapter.
@@ -746,7 +746,7 @@ To this end, we define
 $\XXtil_i = \Phi(\LLtil_i -  \LLtil_{i-1})$.
 This ensures that
 \begin{equation}
-  \label{eq:stoppedmartingale}
+  \label{eq:stoppedmartingale2}
   \XXtil_i
   =
   \begin{cases}
@@ -900,7 +900,7 @@ We then want to bound $\E{\trace{ \exp\left(\theta \XX\right)}}$
 using Lieb's theorem.
 We can handle $\E{\trace{ \exp\left(-\theta \XX\right)}}$ similarly.
 \begin{theorem}[Lieb]
-  \label{thm:Lieb}
+  \label{thm:liebagain}
   Let $f:S^n_{++}\to\R$ be a matrix function given by
   \[ f(\AA) = \trace{\exp\left(\HH+\log(\AA)\right)} \]
   for some $\HH\in S^n$. Then $-f$ is convex (i.e. $f$ is concave).
@@ -925,7 +925,7 @@ corollary.
 \begin{lemma}
   If $0\prec\AA\preceq\BB$, then $\log(\AA)\preceq\log(\BB)$.
 \end{lemma}
-\begin{lemma}\label{lem:ineq_log}
+\begin{lemma}\label{lem:ineq_logagain}
   $\log(\II+\AA) \preceq \AA$ for $\AA\succ-\II$.
 \end{lemma}
 %
@@ -954,7 +954,7 @@ corollary.
 To use Corollary~\ref{cor:trexpub}, we need to construct useful upper
 bounds on $\E{\exp(\XX)}$.
 This can be done, starting from the following lemma.
-\begin{lemma}\label{lem:ineq_exp}
+\begin{lemma}\label{lem:ineq_expagain}
   $\exp(\AA) \preceq \II + \AA + \AA^2$ for $\|\AA\|\leq1$.
 \end{lemma}
 If $\XX$ is zero-mean and $\norm{\XX} \leq 1$,
@@ -1067,7 +1067,7 @@ It is not zero-mean, but we can still bound the trace-exponential
 using Corollary~\ref{cor:trexpub}.
 
 We can also bound the expected matrix exponential in
-that case, using a simple corollary of Lemma~\ref{lem:ineq_exp}.
+that case, using a simple corollary of Lemma~\ref{lem:ineq_expagain}.
 \begin{corollary}\label{cor:ineq_exp_cher}
   $\exp(\AA) \preceq \II + (1+R)\AA $
   for $\matzero \preceq \AA$ with $\norm{\AA} \leq R \leq 1$.
