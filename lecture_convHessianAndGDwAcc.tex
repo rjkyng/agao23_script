@@ -323,7 +323,7 @@ where by definition:
 % \forall \xx \in \R^n,    f(\xx) = f(\bar{\xx}) + \grad f(\bar{\xx})^\trp (\xx-\bar{\xx})+ \frac{1}{2}(\xx-\bar{\xx})^\trp  H_f(\zz(\xx-\bar{\xx})
 % \quad\text{for some $\zz\in[\bar{\xx}, \xx]$.}
 % \end{displaymath}
-We say that $f$ is \emph{ continuously differentiable} on a set $S \subseteq \R^n $ if it is
+We say that $f$ is \emph{twice continuously differentiable} on a set $S \subseteq \R^n $ if it is
 twice differentiable and in addition the gradient and Hessian are continuous on $S$.
 
 As for first order expansions, we have a Taylor's Theorem, which we
@@ -471,8 +471,8 @@ Dividing by $\lambda^2$ and taking $\lambda \to 0^+$ gives us that for any $\mat
 \begin{remark}
 It is important to note that if $S$ is open and $f$ is strictly
 convex, then $\HH_{f}(\xx)$ may still (only) be positive semi-definite
-$\forall \xx \in S$. Consider $f(x) = x^4$ which is strictly convex,
-then the Hessian is $\HH_{f}(x) = 12x^2$ which equals 0 at $x = 0$.
+$\forall \xx \in S$. Consider $f(x) = (x-1)^4$ which is strictly convex,
+then the Hessian is $\HH_{f}(x) = 12(x-1)^2$ which equals 0 at $x = 1$.
 \end{remark}
 
 \section{Gradient Descent - An Approach to Optimization?}

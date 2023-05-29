@@ -182,7 +182,7 @@ where we use Cauchy-Schwarz in the last inequality, i.e. $|\langle \uu, \vv \ran
     \]
     But since the vectors $\ppsi_i$ form an orthonormal basis, we must further have 
     \[
-    		\left(\sum_{i = 1}^n \alpha_i \ppsi_i^{\trp}\right) \cdot \left(\sum_{i = 1}^n \alpha_i \ppsi_i \right) = \sum_{i = 1}^n \alpha_i^2 \leq \sum_{i = 2}^n \alpha_i^2. 
+    		\left(\sum_{i = 1}^n \alpha_i \ppsi_i^{\trp}\right) \cdot \left(\sum_{i = 1}^n \alpha_i \ppsi_i \right) = \sum_{i = 1}^n \alpha_i^2 \geq \sum_{i = 2}^n \alpha_i^2. 
     \]
     \item Finally, we need to show that $\sum_{i=2}^n \beta_i^2 \leq \|\DD^{1/2}\vecone_b\|_2^2 = \dd_b$.  Here, we first observe that 
     \[
@@ -190,7 +190,7 @@ where we use Cauchy-Schwarz in the last inequality, i.e. $|\langle \uu, \vv \ran
     \]
     and then, we can again exploit that the vectors $\ppsi_i$ form an orthonormal basis and therefore 
     \[
-    \|\DD^{1/2}\vecone_b\|_2^2 = (\DD^{1/2}\vecone_b)^{\trp} (\DD^{1/2}\vecone_b) = \left(\sum_{i=1}^n \beta_i \ppsi_i^\trp\right) \left(\sum_{i=1}^n \beta_i \ppsi_i\right) \leq \sum_{i=2}^n \beta_i^2.
+    \|\DD^{1/2}\vecone_b\|_2^2 = (\DD^{1/2}\vecone_b)^{\trp} (\DD^{1/2}\vecone_b) = \left(\sum_{i=1}^n \beta_i \ppsi_i^\trp\right) \left(\sum_{i=1}^n \beta_i \ppsi_i\right) \geq \sum_{i=2}^n \beta_i^2.
     \]
 \end{itemize}
 
