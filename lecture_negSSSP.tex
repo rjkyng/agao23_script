@@ -31,14 +31,14 @@ The following theorem summarizes the guarantees of the algorithm.
 Algorithm \ref{alg:bellmanFord} takes as input a directed, weighted graph $G=(V,E, \ww)$ where weights are allowed to be negative, but that contains no negative cycle; and a source vertex $s \in V$. It runs in time $O(mn)$ and outputs the correct distances from $s$ to every vertex $v \in V$. 
 \end{theorem}
 \begin{proof}
-The algorithm runs for $n$ iterations and relaxes $m$ edges in each iteration, each in $O(1)$ time. This establishes the runtime.
+The algorithm runs for $n$ iterations and relaxes $m$ edges in each iteration, each in $O(1)$ time. This establishes the running time.
 
 We prove correctness by induction. We prove that after the $h$-th iteration of the algorithm, for all vertices $v$ that have a shortest path consisting of at most $h$ edges have $\hat{d}(s,v)$ is equal to the real $s$ to $v$ distance.
 
 The base case $h = 0$ is trivial because $\hat{d}(s,s)$ is initialized to $0$. For the inductive step $h \mapsto h+1$, we use the subpath property of shortest paths, that is, for any $v$ that has an shortest $s$ to $v$ shortest path consisting of exactly $h+1$ edges, we have that for the vertex $u$ preceding $v$ on this path, we have that the subpath from $s$ to $u$ is a shortest path itself and has clearly $<h+1$ edges (it is easy to establish the subpath property via a proof by contradiction). Thus in the $h+1$-th iteration, when the edge $e = (u,v)$ is relaxed, we have $\hat{d}(s, v) \gets \hat{d}(s, u) + w(e)= \mathbf{dist}_G(s,u) + w(e) = \mathbf{dist}_G(s,v)$.
 \end{proof}
 
-\paragraph{A Heuristic for Speeding-Up Bellman-Ford.} If you think a bit longer about Bellman-Ford and why you cannot use Dijkstra, you might actually stumble upon the following idea that might improve runtime in practice: consider that there is a shortest path from $s$ to $v$ that consists of at most $h$ negative edges. Then, we could try to relax negative edges by Bellman-Ford, and relax all non-negative edges between two consecutive edges on the shortest path by using Dijlstra's algorithm.  In fact, we know that after $h$ rounds of this algorithm $v$'s distance estimate just becomes the distance and we therefore never need to relax after round $h+1$ from $v$. 
+\paragraph{A Heuristic for Speeding-Up Bellman-Ford.} If you think a bit longer about Bellman-Ford and why you cannot use Dijkstra, you might actually stumble upon the following idea that might improve running time in practice: consider that there is a shortest path from $s$ to $v$ that consists of at most $h$ negative edges. Then, we could try to relax negative edges by Bellman-Ford, and relax all non-negative edges between two consecutive edges on the shortest path by using Dijlstra's algorithm.  In fact, we know that after $h$ rounds of this algorithm $v$'s distance estimate just becomes the distance and we therefore never need to relax after round $h+1$ from $v$. 
 
 Let us make that intuition precise.
 
@@ -46,7 +46,7 @@ Let us make that intuition precise.
 Given a directed, weighted graph $G=(V,E,\ww)$ with negative weights but no negative cycle and a source $s \in V$. For any vertex $v \in V$, we let $\eta(s,v)$ be the minimum number of negative edges on any shortest $s$ to $v$ path. 
 \end{definition}
 
-The pseudo-code below now formalizes our intuitive approach. It reduces the runtime to $O((\sum_v \eta(s,v) \cdot \mathbf{deg^{out}}(v) + m) \log n)$ which is always upper bounded by $O(nm \log n)$.
+The pseudo-code below now formalizes our intuitive approach. It reduces the running time to $O((\sum_v \eta(s,v) \cdot \mathbf{deg^{out}}(v) + m) \log n)$ which is always upper bounded by $O(nm \log n)$.
 
 \begin{algorithm}
 $\forall u \in V \setminus \{s\}, \hat{d}(s, u) \gets \infty$; $\hat{d}(s,s) \gets 0$.\\
@@ -76,7 +76,7 @@ We can now prove the following theorem which prove that the algorithm above is f
 Algorithm $\textsc{HeuristicBellmanFord}(G,s)$ runs in time $O((\sum_v \eta(s,v) \cdot \mathbf{deg^{out}}(v) + m) \log n)$ time and outputs the correct $s$ to $v$ distances.
 \end{theorem}
 \begin{proof}[Proof Sketch]
-The runtime is trivially analyzed. To avoid a tedious case analysis, let us assume that all out-going edges of $s$ are negative (this can be enforced w.l.o.g.). 
+The running time is trivially analyzed. To avoid a tedious case analysis, let us assume that all out-going edges of $s$ are negative (this can be enforced w.l.o.g.). 
 
 Then correctness follows by induction on $\eta(s,v)$, i.e. after the $h$-th iteration of the algorithm, we have for all vertices $v \in V$ with $\eta(s,v) \leq h$, that $\hat{d}(s,v) = \mathbf{dist}_G(s,v)$. The base case is again trivial. For the inductive step $h \mapsto h+1$, we have that for any $v$ with $\eta(s,v) = h+1$, by the subpath property, we have that the vertex $u$ just before the last negative edge on the shortest $s$ to $v$ path of $h+1$ edges, that $\hat{d}(u)$ is equal to the real distance after iteration $h$. But then $u$ is relaxed in the round after learning the real distance by Bellman-Ford which then decreases the distance of the next vertex on the path. Dijkstra's algorithm then relaxes all non-negative edges in the correct order on the path which leaves $v$'s estimate decreased to the real distance. 
 \end{proof}
@@ -138,7 +138,7 @@ In fact, we can prove that $\phi$ extended by the value $\phi(d) = 0$ for the du
 To see this, observe that the distance from $d$ to any vertex $v$ in $G$ weighted by $\ww_{\phi}$ is $0$ by definition. Thus, the shortest path from $d$ to any vertex $v$ is of weight exactly $0$ w.r.t. $\phi$. But assume that there is an edge $e = (x, v)$ with $\ww_{\phi}(e) < 0$. Then, the path $(d,x)(x,v)$ is of negative weight. But this contradicts that $v$ is at distance $0$ from $d$.
 \end{proof}
 
-Once a price function is found, one can obtain All-Pairs Shortest Paths by simply running Dijkstra's algorithm from each vertex on the graph $G_{\phi}$.  The runtime of this algorithm becomes $\tilde{O}(mn)$. 
+Once a price function is found, one can obtain All-Pairs Shortest Paths by simply running Dijkstra's algorithm from each vertex on the graph $G_{\phi}$.  The running time of this algorithm becomes $\tilde{O}(mn)$. 
 
 \section{Scaling for the Negative-Weight SSSP Problem}
 
@@ -169,7 +169,7 @@ Here, we will not give proof that this algorithm indeed yields \Cref{thm:reduceT
 
 \section{The (Normalized) Negative-Weight SSSP Problem}
 
-Recall, we can now assume that the most negative weight in $G$ is $-2$, and we want to produce a "price" function $\phi$ such that the most negative weight in $G_{\phi}$ is $-1$. For the rest of this section, we focus on giving an implementation of $\textsc{PriceFunctionOnNormalizedGraph}()$ with runtime $\tilde{O}(m\sqrt{m})$.
+Recall, we can now assume that the most negative weight in $G$ is $-2$, and we want to produce a "price" function $\phi$ such that the most negative weight in $G_{\phi}$ is $-1$. For the rest of this section, we focus on giving an implementation of $\textsc{PriceFunctionOnNormalizedGraph}()$ with running time $\tilde{O}(m\sqrt{m})$.
 
 \paragraph{Constant-Degree Assumption.} It will be convenient to assume that $G$ has constant-degree. This is w.l.o.g. since we can take an arbitrary graph $G$ and transform it into a metric-preserving graph $G'$ with $O(m)$ vertices and edges by replacing each vertex $v$ with $d$ edges incident, by a zero-weight cycle with $d$ vertices where each edge on the cycle receives one of the edges originally incident to $v$.
 
@@ -205,7 +205,7 @@ $\phi_3 \gets  \textsc{ComputePriceFunction}(G^{+1}_{\phi_2})$.\label{lne:comput
 \label{alg:negSSSPEasy}
 \end{algorithm}
 
-\paragraph{Analysis.} From the algorithm, it is immediately clear that $\phi_3$ is a price function for $G^{+1}$ and thus satisfies our claim. It remains to bound the runtime.
+\paragraph{Analysis.} From the algorithm, it is immediately clear that $\phi_3$ is a price function for $G^{+1}$ and thus satisfies our claim. It remains to bound the running time.
 
 \begin{claim}
 For each cluster $X_i \in \mathcal{X}$, we have that $\textsc{ComputePriceFunction}(G^{+1}[X_i])$ runs in time $\tilde{O}(n \sqrt{n})$. 
@@ -220,7 +220,7 @@ Finally, note that in $G^{+0}$ each edge carries weight one less than in $G^{+1}
 But this implies that there is a negative cycle in $G$ which yield a contradiction.
 \end{proof}
 
-To analyze the runtime of the call to $ \textsc{ComputePriceFunction}(G^{+1}_{\phi_2})$ in Line \ref{lne:computePriceOnNegBackEdges}, we establish that $\phi_2$ indeed is a price function for $G^{+1} \setminus E_{del}$. 
+To analyze the running time of the call to $ \textsc{ComputePriceFunction}(G^{+1}_{\phi_2})$ in Line \ref{lne:computePriceOnNegBackEdges}, we establish that $\phi_2$ indeed is a price function for $G^{+1} \setminus E_{del}$. 
 
 \begin{claim}
 $\phi_2$ is a price function for $G^{+1} \setminus E_{del}$. 
@@ -239,7 +239,7 @@ Again, this confirms that $\phi_2$ is also a price function on the edges that ar
 \end{proof}
 
 \begin{claim}\label{clm:finalClaimNegSSSP}
-The runtime of the call to $ \textsc{ComputePriceFunction}(G^{+1}_{\phi_2})$ in Line \ref{lne:computePriceOnNegBackEdges} is $\tilde{O}(n \sqrt{n})$ in expectation.
+The running time  of the call to $ \textsc{ComputePriceFunction}(G^{+1}_{\phi_2})$ in Line \ref{lne:computePriceOnNegBackEdges} is $\tilde{O}(n \sqrt{n})$ in expectation.
 \end{claim}
 \begin{proof}
 Again recall that  $\textsc{ComputePriceFunction}(G^{+1}_{\phi_2})$ internally adds a dummy source $d$ and edges of weight $0$ from $d$ to everyone in $G^{+1}_{\phi_2}$, and then computes the price function in time $\tilde{O}(\sum_v \eta(d,v))$ (where we use that $G$ is assumed constant-degree).
@@ -251,4 +251,4 @@ Since further $P'$ consists of at most $n-1$ edges, we have that the weight of $
 
 \section{A Near-Linear-Time Algorithm}
 
-Using the same framework as above one can in fact obtain runtime $\tilde{O}(m)$ for implementing  $\textsc{PriceFunctionOnNormalizedGraph}()$. The only missing trick is that one can also scale of the maximum number of negative edges on any shortest path. To get an idea, observe that if we would know beforehand that this number is at most $\sqrt{n}$, then invoking the LDD algorithm with parameter $n^{1/4}$ in-place of $\sqrt{n}$ will yield an $\tilde{O}(m^{5/4})$ algorithm. The key claim to look at is \Cref{clm:finalClaimNegSSSP} where we then can use that any shortest path has at most $\sqrt{n}$ negative edges and so its total weight in $G^{+2}$ is at most $\sqrt{n}$, and therefore, we now add at most $n^{1/4}$ edges to $E_{del}$ in expectation. 
+Using the same framework as above one can in fact obtain running time $\tilde{O}(m)$ for implementing  $\textsc{PriceFunctionOnNormalizedGraph}()$. The only missing trick is that one can also scale of the maximum number of negative edges on any shortest path. To get an idea, observe that if we would know beforehand that this number is at most $\sqrt{n}$, then invoking the LDD algorithm with parameter $n^{1/4}$ in-place of $\sqrt{n}$ will yield an $\tilde{O}(m^{5/4})$ algorithm. The key claim to look at is \Cref{clm:finalClaimNegSSSP} where we then can use that any shortest path has at most $\sqrt{n}$ negative edges and so its total weight in $G^{+2}$ is at most $\sqrt{n}$, and therefore, we now add at most $n^{1/4}$ edges to $E_{del}$ in expectation. 
