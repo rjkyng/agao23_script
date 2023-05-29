@@ -246,7 +246,8 @@ is surjective onto
  Then, using the product rule and composition rule of derivatives,
   \begin{align*}
     \grad\calE^*(\zz) &= \grad_{\zz} \left(\langle\zz,\yy(\zz)\rangle - \calE(\yy(\zz))\right) \\
-    &= \yy(\zz) + \diag(\zz)\grad_{\zz}\yy(\zz) - \diag(\underbrace{\grad_{\yy}\calE(\yy(\zz)}_{=\zz}))\grad_{\zz}\yy(\zz) \\
+    &= \yy(\zz) + \left( \grad_{\zz}(\yy(\zz)^{\trp})\right)\zz - \left( \grad_{\zz}(\yy(\zz)^{\trp})\right)
+    \underbrace{\grad_{\yy}\calE(\yy(\zz))}_{=\zz}\\
     &= \yy(\zz)
   \end{align*}
   Thus we have $\grad_{\yy}\calE(\yy(\zz)) = \zz$ and
